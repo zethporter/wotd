@@ -25,6 +25,7 @@ export async function handleEmailSubmit(email: string) {
       email: validatedEmail.data,
       created: new Date().toJSON(),
       voted: null,
+      votedForId: null,
     });
 
     console.log(`A document was inserted with the _id: ${result.insertedId}`);
