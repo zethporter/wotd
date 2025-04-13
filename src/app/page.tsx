@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { handleEmailSubmit } from "./actions";
+import { toast } from "sonner";
 
 export default function HomePage() {
   return (
@@ -12,10 +13,19 @@ export default function HomePage() {
         <form
           onSubmit={async (e) => {
             e.preventDefault();
+            const emailToast = toast.loading("Validating Email", {
+              id: "emailValidation",
+            });
             const form = e.target as HTMLFormElement;
             const email = form.elements.namedItem("email") as HTMLInputElement;
             const validatedEmail = await handleEmailSubmit(email.value);
-            console.log("validatedEmail!", validatedEmail);
+            if (validatedEmail.success) {
+              toast.success(validatedEmail.message, { id: emailToast });
+            } else {
+              toast.error(JSON.stringify(validatedEmail.message), {
+                id: emailToast,
+              });
+            }
           }}
           className="fieldset w-sm"
         >

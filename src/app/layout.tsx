@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Toaster } from "sonner";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "WOTD",
@@ -21,8 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body>
-        {children}
+        <Providers>{children}</Providers>
         <Toaster
+          icons={{
+            loading: <span className="loading loading-ball loading-md"></span>,
+          }}
           theme="system"
           toastOptions={{
             unstyled: true,

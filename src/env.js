@@ -8,6 +8,8 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]),
+    MONGO_CONNECTION_STRING: z.string(),
+    UPLOAD_API_KEY: z.string(),
   },
 
   /**
@@ -25,6 +27,9 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    MONGO_CONNECTION_STRING: process.env.MONGO_CONNECTION_STRING,
+    UPLOAD_API_KEY: process.env.UPLOAD_API_KEY,
+
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

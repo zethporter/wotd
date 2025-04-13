@@ -1,14 +1,26 @@
 "use client";
-import Link from "next/link";
+// import Link from "next/link";
 import { toast } from "sonner";
 import { useState, type ChangeEvent } from "react";
 import Papa from "papaparse";
 import { nanoid } from "nanoid";
-import { type Wrestler } from "@/schema";
+import { type Wrestler, a_wrestler } from "@/schema";
+import { handleWrestlersUpload } from "../actions";
 
 export default function EnterVoteCode() {
-  const [wrestlers, setWrestlers] = useState([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [apiKey, setApiKey] = useState("");
+
+  const handleUpload = async () => {
+    toast.loading("Uploading Wrestlers", { id: "wrestlers" });
+    const result = await handleWrestlersUpload(wrestlers, apiKey);
+    if (result.success) {
+      toast.success(result.message, { id: "wrestlers" });
+    } else {
+      console.log({ result });
+      toast.error(result.message, { id: "wrestlers" });
+    }
+  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     toast.loading("Validating Wrestlers list", { id: "wrestlers" });
@@ -48,13 +60,21 @@ export default function EnterVoteCode() {
 
             toast.error(`Parsing errors: ${errorMessages}`);
           } else {
-            const wrestlers = results.data.map((w) => {
+            const _wrestlers = results.data.map((w) => {
               const _id = nanoid();
               w.id = _id;
               return w;
             });
-            setWrestlers(wrestlers);
-            toast.success("Wrestlers Ready for Upload", { id: "wrestlers" });
+            const parsedWrestlers = a_wrestler.safeParse(_wrestlers);
+
+            if (parsedWrestlers.success) {
+              setWrestlers(parsedWrestlers.data);
+              toast.success("Wrestlers Ready for Upload", { id: "wrestlers" });
+            } else {
+              toast.error("Provided CSV was not the proper format", {
+                id: "wrestlers",
+              });
+            }
           }
         },
         error: (err) => {
@@ -69,9 +89,9 @@ export default function EnterVoteCode() {
     <main className="flex min-h-screen flex-col items-center justify-center">
       <div className="container mx-auto flex flex-col items-center justify-center gap-12 p-4">
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            toast.success("Not Implemented");
+            await handleUpload(wrestlers, apiKey);
           }}
           className="fieldset w-sm md:w-md"
         >

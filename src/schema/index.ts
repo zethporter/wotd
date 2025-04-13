@@ -23,3 +23,5 @@ export const wrestler = z.object({
   school: z.string(),
 });
 export type Wrestler = z.infer<typeof wrestler>;
+
+export const a_wrestler = z.array(wrestler);
