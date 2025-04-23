@@ -11,7 +11,8 @@ export async function handleEmailSubmit(email: string) {
     return validatedEmail;
   }
   try {
-    const client = await clientPromise;
+    const client = clientPromise;
+
     const database = client.db("wotd");
     // Specifying a Schema is optional, but it enables type hints on
     // finds and inserts
@@ -58,7 +59,8 @@ export async function handleWrestlersUpload(
     };
   }
   try {
-    const client = await clientPromise;
+    const client = clientPromise;
+
     const database = client.db("wotd");
     // Specifying a Schema is optional, but it enables type hints on
     // finds and inserts
@@ -81,7 +83,8 @@ export async function handleWrestlersUpload(
 export async function getWrestlers(page = 0, pageSize = 10, search = "") {
   // return validatedEmail;
   try {
-    const client = await clientPromise;
+    const client = clientPromise;
+
     const database = client.db("wotd");
     const _collection = database.collection<Wrestler>("wrestlers");
 

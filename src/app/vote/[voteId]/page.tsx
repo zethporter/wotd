@@ -10,9 +10,10 @@ import {
 // import { getQueryClient } from '@/app/get-query-client'
 
 import { getWrestlers } from "@/app/actions";
+import { type Wrestler } from "@/schema";
+import VoteItem from "./VoteItem";
 
-export default function HomePage() {
-  const [search, setSearch] = useState<string>("");
+const WrestlersList = ({ search }: { search: string }) => {
   const {
     data,
     error,
@@ -42,6 +43,39 @@ export default function HomePage() {
       return firstPageParam - 1;
     },
   });
+
+  if (status === "pending") return <p>Loading...</p>;
+  if (status === "error") return <p>Something went wrong</p>;
+
+  return (
+    <div>
+      {data.pages.map((page) =>
+        page.data.map((wrestler: Wrestler) => (
+          <VoteItem key={wrestler.id} wrestler={wrestler} />
+        )),
+      )}
+      <button
+        disabled={!hasNextPage}
+        type="button"
+        onClick={() => fetchNextPage()}
+        className="btn btn-wide glass"
+      >
+        Load More
+      </button>
+
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+      <div className="toast">
+        <div className="alert alert-info alert-soft">
+          <span>{status}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function HomePage() {
+  const [search, setSearch] = useState<string>("");
+
   return (
     <main className="flex min-h-screen flex-col p-4">
       <div className="container mx-auto flex flex-col gap-12 px-4">
@@ -71,21 +105,7 @@ export default function HomePage() {
             placeholder="Search"
           />
         </label>
-        <pre className="bg-base-200 rounded-box p-4">
-          {JSON.stringify(data, null, 2)}
-        </pre>
-        <button
-          type="button"
-          onClick={fetchNextPage}
-          className="btn btn-wide glass"
-        >
-          Load More
-        </button>
-      </div>
-      <div className="toast">
-        <div className="alert alert-info alert-soft">
-          <span>{status}</span>
-        </div>
+        <WrestlersList search={search} />
       </div>
     </main>
   );

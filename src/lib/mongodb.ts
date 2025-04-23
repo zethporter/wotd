@@ -1,17 +1,33 @@
-// lib/mongodb.js
 import { MongoClient } from "mongodb";
 
-const options = {};
-const uri = process.env.MONGO_CONNECTION_STRING;
-
 if (!process.env.MONGO_CONNECTION_STRING) {
-  throw new Error("Please add your Mongo URI to .env.local");
+  throw new Error(
+    'Invalid/Missing environment variable: "MONGO_CONNECTION_STRING"',
+  );
 }
 
-const client: MongoClient = new MongoClient(uri!, options);
-const clientPromise: Promise<MongoClient> = client.connect();
+const uri = process.env.MONGO_CONNECTION_STRING;
+const options = { appName: "devrel.template.nextjs" };
 
-// Export a module-scoped MongoClient promise. By doing this in a
-// separate module, the client can be safely reused across multiple
-// functions.
-export default clientPromise;
+let client: MongoClient;
+
+if (process.env.NODE_ENV === "development") {
+  // In development mode, use a global variable so that the value
+  // is preserved across module reloads caused by HMR (Hot Module Replacement).
+  let globalWithMongo = global as typeof globalThis & {
+    _mongoClient?: MongoClient;
+  };
+
+  if (!globalWithMongo._mongoClient) {
+    globalWithMongo._mongoClient = new MongoClient(uri, options);
+  }
+  client = globalWithMongo._mongoClient;
+} else {
+  // In production mode, it's best to not use a global variable.
+  client = new MongoClient(uri, options);
+}
+
+// Export a module-scoped MongoClient. By doing this in a
+// separate module, the client can be shared across functions.
+
+export default client;
