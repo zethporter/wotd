@@ -7,6 +7,8 @@ import {
   dehydrate,
   useInfiniteQuery,
 } from "@tanstack/react-query";
+import { useParams, useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
 // import { getQueryClient } from '@/app/get-query-client'
 
 import { getWrestlers } from "@/app/actions";
@@ -31,7 +33,9 @@ const WrestlersList = ({ search }: { search: string }) => {
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
-      if (lastPage.length === 0) {
+      if (
+        lastPage.pagination?.currentPage === lastPage.pagination?.totalPages
+      ) {
         return undefined;
       }
       return lastPageParam + 1;
@@ -48,7 +52,7 @@ const WrestlersList = ({ search }: { search: string }) => {
   if (status === "error") return <p>Something went wrong</p>;
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {data.pages.map((page) =>
         page.data.map((wrestler: Wrestler) => (
           <VoteItem key={wrestler.id} wrestler={wrestler} />
@@ -58,55 +62,64 @@ const WrestlersList = ({ search }: { search: string }) => {
         disabled={!hasNextPage}
         type="button"
         onClick={() => fetchNextPage()}
-        className="btn btn-wide glass"
+        className="btn btn-wide btn-secondary btn-soft mx-auto"
       >
         Load More
       </button>
-
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-      <div className="toast">
-        <div className="alert alert-info alert-soft">
-          <span>{status}</span>
-        </div>
-      </div>
     </div>
   );
 };
 
 export default function HomePage() {
   const [search, setSearch] = useState<string>("");
+  const { voteId } = useParams();
+  const searchParams = useSearchParams();
+  // need to check `voteId` to make sure it is valid
 
   return (
-    <main className="flex min-h-screen flex-col p-4">
-      <div className="container mx-auto flex flex-col gap-12 px-4">
-        <h1 className="text-center text-4xl font-bold md:text-5xl">
-          Vote for Outstanding Wrestler
-        </h1>
-        <label className="input">
-          <svg
-            className="h-[1em] opacity-50"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-          >
-            <g
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              strokeWidth="2.5"
-              fill="none"
-              stroke="currentColor"
+    <AnimatePresence>
+      <main className="flex min-h-screen">
+        <div className="container mx-auto flex flex-col items-center gap-12 px-4 py-10">
+          <h1 className="text-center text-2xl font-bold md:text-5xl">
+            Vote for Outstanding Wrestler
+          </h1>
+          <label className="input input-lg md:input-xl w-full self-start">
+            <svg
+              className="h-[1em] opacity-50"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
             >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.3-4.3"></path>
-            </g>
-          </svg>
-          <input
-            onChange={(e) => setSearch(e.target.value)}
-            type="search"
-            placeholder="Search"
-          />
-        </label>
-        <WrestlersList search={search} />
-      </div>
-    </main>
+              <g
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeWidth="2.5"
+                fill="none"
+                stroke="currentColor"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </g>
+            </svg>
+            <input
+              onChange={(e) => setSearch(e.target.value)}
+              type="search"
+              placeholder="Search"
+            />
+          </label>
+          <WrestlersList search={search} />
+          {searchParams.has("id") && (
+            <motion.button
+              initial={{ y: 100 }}
+              animate={{ y: 0 }}
+              exit={{ y: -100 }}
+              className="btn btn-primary btn-lg btn-wide fixed right-[50%] bottom-10 translate-x-[50%]"
+              type="button"
+            >
+              Submit Vote
+            </motion.button>
+          )}
+        </div>
+      </main>
+    </AnimatePresence>
   );
 }
