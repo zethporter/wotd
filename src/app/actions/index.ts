@@ -3,6 +3,7 @@ import { z } from "zod";
 import { nanoid } from "nanoid";
 import { type Voter, type Wrestler, a_wrestler } from "@/schema";
 import clientPromise from "@/lib/mongodb";
+import { redirect } from "next/navigation";
 
 export async function handleEmailSubmit(email: string) {
   const validatedEmail = z.string().email().safeParse(email);
@@ -130,4 +131,28 @@ export async function getWrestlers(page = 0, pageSize = 10, search = "") {
     console.error(e);
     return { data: [], pagination: null, search: null }; // Or handle the error as needed
   }
+}
+
+export async function validateVoteCode(code: string | null) {
+  if (code === null) {
+    redirect("/");
+  }
+  const client = clientPromise;
+
+  const database = client.db("wotd");
+  // Specifying a Schema is optional, but it enables type hints on
+  // finds and inserts
+
+  const voterCollection = database.collection<Voter>("submitters");
+  const result = await voterCollection.findOne({ id: code });
+
+  if (!result) {
+    redirect("/invalid-id");
+  }
+
+  if (result.voted !== null) {
+    console.log(`id: ${code} already voted`);
+    redirect("/already-voted");
+  }
+  return "validated";
 }

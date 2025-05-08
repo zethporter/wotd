@@ -22,7 +22,7 @@ export default function HomePage() {
             if (validatedEmail.success) {
               toast.success(validatedEmail.message, { id: emailToast });
             } else {
-              toast.error(JSON.stringify(validatedEmail.message), {
+              toast.error("Invalid Email", {
                 id: emailToast,
               });
             }
