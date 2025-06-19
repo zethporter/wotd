@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { validateVoteCode } from "@/app/actions";
 
