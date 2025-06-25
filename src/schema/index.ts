@@ -6,7 +6,6 @@ export const voter = z.object({
   email: z.string(),
   created: z.string().date(),
   voted: z.string().date().nullable(),
-  votedForId: z.string().nullable(),
 });
 export type Voter = z.infer<typeof voter>;
 

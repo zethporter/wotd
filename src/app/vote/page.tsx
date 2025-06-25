@@ -5,10 +5,12 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { validateVoteCode } from "@/app/actions";
+import { toast } from "sonner";
 
-import { getWrestlers } from "@/app/actions";
+import { getWrestlers, submitVote } from "@/app/actions";
 import { type Wrestler } from "@/schema";
 import VoteItem from "./VoteItem";
+import { ActionFailedError } from "@/lib/errors";
 
 const WrestlersList = ({ search }: { search: string }) => {
   const {
@@ -71,6 +73,29 @@ export default function VotePage() {
   const searchParams = useSearchParams();
   // need to check `voteId` to make sure it is valid
 
+  const handleVote = async () => {
+    try {
+      const id = searchParams.get("id");
+      const voteId = searchParams.get("voteId");
+
+      if (id !== null && voteId !== null) {
+        toast.loading("Submitting Vote", { id: "votingToast" });
+        await submitVote(voteId, id);
+      } else {
+        toast.error("missing some information. Please try again.", {
+          id: "votingToast",
+        });
+      }
+    } catch (e) {
+      if (e instanceof ActionFailedError) {
+        toast.error(e.message);
+      } else {
+        toast.dismiss();
+        console.log(JSON.stringify(e), { id: "votingToast" });
+      }
+    }
+  };
+
   useEffect(() => {
     async function validator() {
       const voteId = searchParams.get("voteId");
@@ -123,7 +148,11 @@ export default function VotePage() {
           }}
           className="fixed bottom-10 flex w-full justify-center"
         >
-          <button type="button" className="btn btn-primary btn-lg btn-wide">
+          <button
+            onClick={() => handleVote()}
+            type="button"
+            className="btn btn-primary btn-lg btn-wide"
+          >
             Submit Vote
             <svg
               xmlns="http://www.w3.org/2000/svg"

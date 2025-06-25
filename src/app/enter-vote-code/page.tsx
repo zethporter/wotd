@@ -1,7 +1,9 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function EnterVoteCode() {
+  const [voteId, setVoteId] = useState("");
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <div className="container mx-auto flex flex-col items-center justify-center gap-12 px-4">
@@ -12,18 +14,7 @@ export default function EnterVoteCode() {
           </span>{" "}
           from your email
         </h1>
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const form = e.target as HTMLFormElement;
-            const voteCode = form.elements.namedItem(
-              "voteCode",
-            ) as HTMLInputElement;
-            // const validatedEmail = await handleEmailSubmit(email.value);
-            console.log("voteCode!", voteCode);
-          }}
-          className="fieldset w-sm md:w-md"
-        >
+        <fieldset className="fieldset w-sm md:w-md">
           <div className="flex w-full flex-row flex-wrap items-center justify-center gap-2">
             <div className="grow">
               <label className="input input-lg md:input-xl input-secondary validator join-item w-full">
@@ -42,13 +33,20 @@ export default function EnterVoteCode() {
                   />
                 </svg>
 
-                <input name="voteCode" type="text" placeholder="code" />
+                <input
+                  name="voteCode"
+                  type="text"
+                  placeholder="code"
+                  value={voteId}
+                  onChange={(e) => setVoteId(e.target.value)}
+                />
               </label>
               <div className="validator-hint hidden">
                 Enter Vote code from your email
               </div>
             </div>
-            <button
+            <Link
+              href={`/vote?voteId=${voteId}`}
               type="submit"
               className="btn btn-md md:btn-lg btn-circle btn-secondary"
             >
@@ -66,12 +64,12 @@ export default function EnterVoteCode() {
                   d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"
                 />
               </svg>
-            </button>
+            </Link>
             <Link href={"/"} className="link link-primary w-full text-center">
               Missing Code? Click here to request a code
             </Link>
           </div>
-        </form>
+        </fieldset>
       </div>
     </main>
   );

@@ -1,9 +1,10 @@
 "use server";
 import { z } from "zod";
 import { nanoid } from "nanoid";
-import { type Voter, type Wrestler, a_wrestler } from "@/schema";
+import { type Voter, type Wrestler, a_wrestler, type Vote } from "@/schema";
 import clientPromise from "@/lib/mongodb";
 import { redirect } from "next/navigation";
+import { ActionFailedError } from "@/lib/errors";
 
 export async function handleEmailSubmit(email: string) {
   const validatedEmail = z.string().email().safeParse(email);
@@ -24,7 +25,6 @@ export async function handleEmailSubmit(email: string) {
       email: validatedEmail.data,
       created: new Date().toJSON(),
       voted: null,
-      votedForId: null,
     });
 
     console.log(`A document was inserted with the _id: ${result.insertedId}`);
@@ -66,10 +66,12 @@ export async function handleWrestlersUpload(
     // Specifying a Schema is optional, but it enables type hints on
     // finds and inserts
 
-    const _collection = database.collection<Wrestler>("wrestlers");
+    const wrestlersCollection = database.collection<Wrestler>("wrestlers");
     console.log(JSON.stringify(validatedWrestlers.data, null, 2));
 
-    const uploadResult = await _collection.insertMany(validatedWrestlers.data);
+    const uploadResult = await wrestlersCollection.insertMany(
+      validatedWrestlers.data,
+    );
     console.log(JSON.stringify(uploadResult, null, 2));
     return { success: true, message: "Wrestlers Uploaded" };
   } catch (error) {
@@ -155,4 +157,29 @@ export async function validateVoteCode(code: string | null) {
     redirect("/already-voted");
   }
   return "validated";
+}
+
+export async function submitVote(code: string, wrestlerId: string) {
+  const client = clientPromise;
+  const database = client.db("wotd");
+  const votesCollection = database.collection<Vote>("votes");
+  const voterCollection = database.collection<Voter>("submitters");
+
+  const voteExists = await votesCollection.findOne({ voteId: code });
+  const voter = await voterCollection.findOne({ id: code });
+  if (voteExists === null && voter !== null) {
+    const voteResult = await votesCollection.insertOne({
+      voteDateTime: new Date().toJSON(),
+      voteKey: code,
+      wrestlerId: wrestlerId,
+    });
+    const voterResult = await voterCollection.updateOne(voter, {
+      $set: {
+        voted: new Date().toJSON(),
+      },
+    });
+    console.log(JSON.stringify({ voteResult, voterResult }, null, 2));
+    redirect("/vote-submitted");
+  }
+  throw new ActionFailedError("There is already a vote logged for this User.");
 }
