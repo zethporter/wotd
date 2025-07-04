@@ -1,24 +1,37 @@
 "use client";
+import Link from "next/link";
 import { handleEmailSubmit } from "./actions";
+import { toast } from "sonner";
 
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <h1 className="text-5xl font-bold">Vote for Outstanding Wrestler</h1>
+      <div className="container mx-auto flex flex-col items-center justify-center gap-12 px-4">
+        <h1 className="text-center text-4xl font-bold md:text-5xl">
+          Vote for Outstanding Wrestler
+        </h1>
         <form
           onSubmit={async (e) => {
             e.preventDefault();
+            const emailToast = toast.loading("Validating Email", {
+              id: "emailValidation",
+            });
             const form = e.target as HTMLFormElement;
             const email = form.elements.namedItem("email") as HTMLInputElement;
             const validatedEmail = await handleEmailSubmit(email.value);
-            console.log("validatedEmail!", validatedEmail);
+            if (validatedEmail.success) {
+              toast.success(validatedEmail.message, { id: emailToast });
+            } else {
+              toast.error("Invalid Email", {
+                id: emailToast,
+              });
+            }
           }}
           className="fieldset w-sm"
         >
-          <div className="flex flex-row gap-4">
+          <div className="flex w-full flex-row items-center justify-center gap-4">
             <div>
-              <label className="input input-xl input-primary validator join-item">
+              <label className="input input-lg md:input-xl input-primary validator join-item">
                 <svg
                   className="h-[1em] opacity-50"
                   xmlns="http://www.w3.org/2000/svg"
@@ -41,7 +54,10 @@ export default function HomePage() {
                 Enter valid email address
               </div>
             </div>
-            <button type="submit" className="btn btn-xl btn-circle btn-primary">
+            <button
+              type="submit"
+              className="btn btn-md md:btn-lg btn-circle btn-primary"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -59,10 +75,15 @@ export default function HomePage() {
             </button>
           </div>
         </form>
-        <div role="alert" className="alert alert-info alert-soft">
-          To avoid people voting a million times. We unfortunately will have to
-          send you a vote email. If you are having trouble with the link in your
-          email. Please copy the code provided and click here.
+        <div className="flex flex-row flex-wrap justify-center gap-1">
+          <div role="alert" className="alert alert-info alert-soft w-full">
+            To avoid people voting a million times. We unfortunately will have
+            to send you a vote email. If you are having trouble with the link in
+            your email. Please copy the code provided and click below.
+          </div>
+          <Link href={"/enter-vote-code"} className="link link-secondary">
+            Click here to enter vote code
+          </Link>
         </div>
       </div>
     </main>
