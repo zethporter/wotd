@@ -18,6 +18,7 @@
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.6.2",
     "@tailwindcss/vite": "^4.1.11",
+    "@tanstack/solid-query": "^5.83.0",
     "@tanstack/solid-router": "^1.127.0",
     "@tanstack/solid-start": "^1.127.0",
     "class-variance-authority": "^0.7.1",
