@@ -24,17 +24,25 @@ function RouteComponent() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-    isError,
+    status,
     error,
   } = useInfiniteQuery({
-    queryKey: ["wrestlers", search],
-    queryFn: async ({ pageParam, queryKey }) => {
+    queryKey: ["wrestlers", search()],
+    queryFn: async ({
+      pageParam,
+      queryKey,
+    }: {
+      pageParam: number;
+      queryKey: [string, string];
+    }) => {
       // const res = await fetch('/api/projects?cursor=' + pageParam)
       // return res.json()
-      return await getWrestlers(pageParam, 10, queryKey[1]);
+      return await getWrestlers({
+        data: { page: pageParam, pageSize: 10, search: queryKey[1] },
+      });
     },
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+    getNextPageParam: (lastPage: any, allPages: any, lastPageParam: any) => {
       if (
         lastPage.pagination?.currentPage === lastPage.pagination?.totalPages
       ) {
@@ -42,7 +50,11 @@ function RouteComponent() {
       }
       return lastPageParam + 1;
     },
-    getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
+    getPreviousPageParam: (
+      firstPage: any,
+      allPages: any,
+      firstPageParam: any,
+    ) => {
       if (firstPageParam <= 1) {
         return undefined;
       }
@@ -58,11 +70,11 @@ function RouteComponent() {
         <p>Loading initial posts...</p>
       </Show>
 
-      <Show when={isError}>
+      <Show when={status === "error"}>
         <p>Error: {error?.message}</p>
       </Show>
 
-      <Show when={data}>
+      <Show when={status === "success"}>
         {/* <For each={data!.pages.flat()}>
           {(post) => (
             <div

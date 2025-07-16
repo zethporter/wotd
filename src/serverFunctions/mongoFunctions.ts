@@ -10,6 +10,7 @@ import clientPromise from "@/lib/mongo";
 // import { redirect } from "next/navigation"; // TODO: find replacement
 import { redirect } from "@tanstack/solid-router";
 import { ActionFailedError } from "@/lib/errors";
+import { createServerFn } from "@tanstack/solid-start";
 
 export async function handleEmailSubmit(email: string) {
   const validatedEmail = z.string().email().safeParse(email);
@@ -49,7 +50,7 @@ export async function handleWrestlersUpload(
   wrestlers: Wrestler[],
   apiKey: string,
 ) {
-  if (apiKey !== process.env.UPLOAD_API_KEY) {
+  if (apiKey !== import.meta.env.UPLOAD_API_KEY) {
     return {
       success: false,
       message: "invalid api key",
@@ -88,9 +89,20 @@ export async function handleWrestlersUpload(
   }
 }
 
-export async function getWrestlers(page = 0, pageSize = 10, search = "") {
-  // return validatedEmail;
-  try {
+type GetWrestlers = {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+};
+
+export const getWrestlers = createServerFn({ method: "GET" })
+  .validator((data: GetWrestlers) => ({
+    page: data.page ?? 0,
+    pageSize: data.pageSize ?? 10,
+    search: data.search ?? "",
+  }))
+  .handler(async ({ data }) => {
+    const { page, pageSize, search } = data;
     const client = clientPromise;
 
     const database = client.db("wotd");
@@ -108,7 +120,7 @@ export async function getWrestlers(page = 0, pageSize = 10, search = "") {
 
     console.log("query", JSON.stringify(query));
 
-    const data = await _collection
+    const rawReturnData = await _collection
       .find(query, {
         projection: {
           _id: 0, // Exclude the _id field
@@ -121,11 +133,17 @@ export async function getWrestlers(page = 0, pageSize = 10, search = "") {
       .limit(pageSize)
       .toArray();
 
+    const returnData = rawReturnData.map((doc) => ({
+      id: doc.id,
+      name: doc.name,
+      school: doc.school,
+    }));
+
     const totalCount = await _collection.countDocuments(query);
     const totalPages = Math.ceil(totalCount / pageSize);
 
     return {
-      data,
+      data: returnData,
       pagination: {
         currentPage: page,
         pageSize,
@@ -134,11 +152,19 @@ export async function getWrestlers(page = 0, pageSize = 10, search = "") {
       },
       search,
     };
-  } catch (e) {
-    console.error(e);
-    return { data: [], pagination: null, search: null }; // Or handle the error as needed
-  }
-}
+  });
+
+// greet({
+//   data: {
+//     name: "John",
+//     age: 34,
+//   },
+// });
+
+// export async function getWrestlers(page = 0, pageSize = 10, search = "") {
+//   // return validatedEmail;
+
+// }
 
 // export async function validateVoteCode(code: string | null) {
 //   if (code === null) {
