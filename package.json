@@ -10,6 +10,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "daisyui": "^5.0.46",
+    "drizzle-kit": "^0.31.4",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "peerDependencies": {
@@ -17,13 +18,16 @@
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.6.2",
+    "@libsql/client": "^0.15.10",
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/solid-query": "^5.83.0",
     "@tanstack/solid-router": "^1.127.0",
+    "@tanstack/solid-router-devtools": "^1.128.0",
     "@tanstack/solid-start": "^1.127.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "mongodb": "^6.17.0",
+    "drizzle-orm": "^0.44.3",
+    "drizzle-zod": "^0.8.2",
     "nanoid": "^5.1.5",
     "papaparse": "^5.5.3",
     "solid-js": "^1.9.7",

@@ -1,9 +1,13 @@
 // src/routes/__root.tsx
 /// <reference types="vite/client" />
 import { Outlet, createRootRoute } from "@tanstack/solid-router";
+import { TanStackRouterDevtools } from "@tanstack/solid-router-devtools";
+import { QueryClientProvider } from "@tanstack/solid-query";
 import { FingerprintProvider } from "@/providers/FingerprintProvider";
 
 import appCss from "../styles/app.css?url";
+
+import { queryClient } from "@/router";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -27,7 +31,10 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <FingerprintProvider>
-      <Outlet />
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+        <TanStackRouterDevtools />
+      </QueryClientProvider>
     </FingerprintProvider>
   );
 }
