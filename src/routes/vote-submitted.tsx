@@ -1,7 +1,7 @@
 import { createFileRoute, useRouteContext } from "@tanstack/solid-router";
 import { useInfiniteQuery } from "@tanstack/solid-query";
 import { For, createSignal, Show } from "solid-js";
-import { getWrestlers } from "@/serverFunctions/mongoFunctions";
+import { getWrestlers } from "@/serverFunctions/tursoFunctions";
 
 export const Route = createFileRoute("/vote-submitted")({
   component: RouteComponent,
@@ -32,34 +32,32 @@ function RouteComponent() {
       pageParam,
       queryKey,
     }: {
-      pageParam: number;
+      pageParam: string;
       queryKey: [string, string];
     }) => {
       // const res = await fetch('/api/projects?cursor=' + pageParam)
       // return res.json()
       return await getWrestlers({
-        data: { page: pageParam, pageSize: 10, search: queryKey[1] },
+        data: { cursor: pageParam, pageSize: 10, search: queryKey[1] },
       });
     },
-    initialPageParam: 0,
+    initialPageParam: undefined,
     getNextPageParam: (lastPage: any, allPages: any, lastPageParam: any) => {
-      if (
-        lastPage.pagination?.currentPage === lastPage.pagination?.totalPages
-      ) {
+      if (lastPage.pagination?.lastCursor === undefined) {
         return undefined;
       }
-      return lastPageParam + 1;
+      return lastPage.pagination?.lastCursor;
     },
-    getPreviousPageParam: (
-      firstPage: any,
-      allPages: any,
-      firstPageParam: any,
-    ) => {
-      if (firstPageParam <= 1) {
-        return undefined;
-      }
-      return firstPageParam - 1;
-    },
+    // getPreviousPageParam: (
+    //   firstPage: any,
+    //   allPages: any,
+    //   firstPageParam: any,
+    // ) => {
+    //   if (firstPageParam <= 1) {
+    //     return undefined;
+    //   }
+    //   return firstPageParam - 1;
+    // },
   });
 
   return (
