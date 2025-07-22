@@ -9,18 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VoteSubmittedRouteImport } from './routes/vote-submitted'
 import { Route as VoteRouteImport } from './routes/vote'
 import { Route as UploadWrestlersRouteImport } from './routes/upload-wrestlers'
 import { Route as EnterVoteCodeRouteImport } from './routes/enter-vote-code'
 import { Route as AlreadyVotedRouteImport } from './routes/already-voted'
 import { Route as IndexRouteImport } from './routes/index'
 
-const VoteSubmittedRoute = VoteSubmittedRouteImport.update({
-  id: '/vote-submitted',
-  path: '/vote-submitted',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const VoteRoute = VoteRouteImport.update({
   id: '/vote',
   path: '/vote',
@@ -53,7 +47,6 @@ export interface FileRoutesByFullPath {
   '/enter-vote-code': typeof EnterVoteCodeRoute
   '/upload-wrestlers': typeof UploadWrestlersRoute
   '/vote': typeof VoteRoute
-  '/vote-submitted': typeof VoteSubmittedRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -61,7 +54,6 @@ export interface FileRoutesByTo {
   '/enter-vote-code': typeof EnterVoteCodeRoute
   '/upload-wrestlers': typeof UploadWrestlersRoute
   '/vote': typeof VoteRoute
-  '/vote-submitted': typeof VoteSubmittedRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -70,7 +62,6 @@ export interface FileRoutesById {
   '/enter-vote-code': typeof EnterVoteCodeRoute
   '/upload-wrestlers': typeof UploadWrestlersRoute
   '/vote': typeof VoteRoute
-  '/vote-submitted': typeof VoteSubmittedRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,7 +71,6 @@ export interface FileRouteTypes {
     | '/enter-vote-code'
     | '/upload-wrestlers'
     | '/vote'
-    | '/vote-submitted'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -88,7 +78,6 @@ export interface FileRouteTypes {
     | '/enter-vote-code'
     | '/upload-wrestlers'
     | '/vote'
-    | '/vote-submitted'
   id:
     | '__root__'
     | '/'
@@ -96,7 +85,6 @@ export interface FileRouteTypes {
     | '/enter-vote-code'
     | '/upload-wrestlers'
     | '/vote'
-    | '/vote-submitted'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -105,18 +93,10 @@ export interface RootRouteChildren {
   EnterVoteCodeRoute: typeof EnterVoteCodeRoute
   UploadWrestlersRoute: typeof UploadWrestlersRoute
   VoteRoute: typeof VoteRoute
-  VoteSubmittedRoute: typeof VoteSubmittedRoute
 }
 
-declare module '@tanstack/solid-router' {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vote-submitted': {
-      id: '/vote-submitted'
-      path: '/vote-submitted'
-      fullPath: '/vote-submitted'
-      preLoaderRoute: typeof VoteSubmittedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/vote': {
       id: '/vote'
       path: '/vote'
@@ -161,7 +141,6 @@ const rootRouteChildren: RootRouteChildren = {
   EnterVoteCodeRoute: EnterVoteCodeRoute,
   UploadWrestlersRoute: UploadWrestlersRoute,
   VoteRoute: VoteRoute,
-  VoteSubmittedRoute: VoteSubmittedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

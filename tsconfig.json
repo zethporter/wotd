@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     // Environment setup & latest features
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
+    "jsx": "react-jsx",
     "module": "ESNext",
     "target": "ES2022",
     "strictNullChecks": true,

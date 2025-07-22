@@ -2,7 +2,8 @@
 import { defineConfig } from "vite";
 import { dirname, resolve } from "node:path";
 import tsConfigPaths from "vite-tsconfig-paths";
-import { tanstackStart } from "@tanstack/solid-start/plugin/vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
@@ -14,5 +15,10 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
     },
   },
-  plugins: [tsConfigPaths(), tanstackStart(), tailwindcss()],
+  plugins: [
+    tsConfigPaths(),
+    tanstackStart({ customViteReactPlugin: true }),
+    tailwindcss(),
+    viteReact(),
+  ],
 });

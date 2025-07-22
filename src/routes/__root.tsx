@@ -1,40 +1,66 @@
 // src/routes/__root.tsx
 /// <reference types="vite/client" />
-import { Outlet, createRootRoute } from "@tanstack/solid-router";
-import { TanStackRouterDevtools } from "@tanstack/solid-router-devtools";
-import { QueryClientProvider } from "@tanstack/solid-query";
-import { FingerprintProvider } from "@/providers/FingerprintProvider";
+import type { ReactNode } from "react";
+import {
+  Outlet,
+  createRootRoute,
+  HeadContent,
+  Scripts,
+} from "@tanstack/react-router";
+import { ThemeProvider } from "@/components/theme-provider";
+import { FingerprintProvider } from "@/components/fingerprint-provider";
 
-import appCss from "../styles/app.css?url";
-
-import { queryClient } from "@/router";
+import appCss from "@/styles/app.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
-        charset: "utf-8",
+        charSet: "utf-8",
       },
       {
         name: "viewport",
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "wotd",
+        title: "TanStack Start Starter",
       },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
+    ],
   }),
   component: RootComponent,
 });
 
 function RootComponent() {
   return (
-    <FingerprintProvider>
-      <QueryClientProvider client={queryClient}>
-        <Outlet />
-        <TanStackRouterDevtools />
-      </QueryClientProvider>
-    </FingerprintProvider>
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  );
+}
+
+function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+  return (
+    <html>
+      <head>
+        <HeadContent />
+      </head>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <FingerprintProvider
+          defaultFingerprint={null}
+          storageKey="calculated-fingerprint"
+        >
+          <body>
+            {children}
+            <Scripts />
+          </body>
+        </FingerprintProvider>
+      </ThemeProvider>
+    </html>
   );
 }

@@ -2,19 +2,16 @@
 import {
   createRouter as createTanStackRouter,
   ErrorComponent,
-} from "@tanstack/solid-router";
+} from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
-import { QueryClient } from "@tanstack/solid-query";
+// import { QueryClient } from "@tanstack/react-query";
 
-export const queryClient = new QueryClient();
+// export const queryClient = new QueryClient();
 
 export function createRouter() {
   const router = createTanStackRouter({
     defaultPreload: "intent",
     routeTree,
-    context: {
-      queryClient,
-    },
     defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
     scrollRestoration: true,
   });
@@ -22,7 +19,7 @@ export function createRouter() {
   return router;
 }
 
-declare module "@tanstack/solid-router" {
+declare module "@tanstack/react-router" {
   interface Register {
     router: ReturnType<typeof createRouter>;
   }

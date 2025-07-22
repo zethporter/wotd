@@ -73,7 +73,7 @@ const VoteItem = (props: { wrestler: Wrestler }) => {
 
   return (
     <div
-      class="border-secondary rounded-field hover:bg-secondary/20 flex w-fit items-center gap-2 p-2"
+      className="border-secondary rounded-field hover:bg-secondary/20 flex w-fit items-center gap-2 p-2"
       // SolidJS doesn't have optional chaining for event handlers
       // and directly calling .click() on a ref might not update the ref
       // in time for a click event if it's rendered conditionally.
@@ -84,7 +84,7 @@ const VoteItem = (props: { wrestler: Wrestler }) => {
       <input
         ref={checkboxRef} // Assigns the DOM element directly
         type="checkbox"
-        class="checkbox checkbox-primary checkbox-sm md:checkbox-md"
+        className="checkbox checkbox-primary checkbox-sm md:checkbox-md"
         // checked is a reactive prop in SolidJS.
         // It will automatically update when isChecked() changes (which depends on searchParams()).
         checked={isChecked()}
@@ -118,7 +118,7 @@ const VoteItem = (props: { wrestler: Wrestler }) => {
           console.log("Checkbox clicked directly.");
         }}
       />
-      <p class="text-xl font-bold md:text-2xl">{wrestler.name}</p>
+      <p className="text-xl font-bold md:text-2xl">{wrestler.name}</p>
       <p>{wrestler.school}</p>
     </div>
   );
