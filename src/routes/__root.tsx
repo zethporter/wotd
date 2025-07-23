@@ -9,6 +9,12 @@ import {
 } from "@tanstack/react-router";
 import { ThemeProvider } from "@/components/theme-provider";
 import { FingerprintProvider } from "@/components/fingerprint-provider";
+import { ModeToggle } from "@/components/mode-toggle";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// Create a client
+const queryClient = new QueryClient();
 
 import appCss from "@/styles/app.css?url";
 
@@ -40,6 +46,7 @@ function RootComponent() {
   return (
     <RootDocument>
       <Outlet />
+      <TanStackRouterDevtools />
     </RootDocument>
   );
 }
@@ -50,17 +57,20 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <HeadContent />
       </head>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <FingerprintProvider
-          defaultFingerprint={null}
-          storageKey="calculated-fingerprint"
-        >
-          <body>
-            {children}
-            <Scripts />
-          </body>
-        </FingerprintProvider>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <FingerprintProvider
+            defaultFingerprint={null}
+            storageKey="calculated-fingerprint"
+          >
+            <body>
+              {children}
+              <Scripts />
+              <ModeToggle />
+            </body>
+          </FingerprintProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </html>
   );
 }

@@ -1,6 +1,9 @@
+import React from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useInfiniteQuery } from "@tanstack/react-query";
 // import { createResource, Show } from "solid-js";
-// import { useFingerprint } from "@/providers/FingerprintProvider";
+import { useFingerprint } from "@/components/fingerprint-provider";
+import { getWrestlers } from "@/serverFunctions/tursoFunctions";
 
 export const Route = createFileRoute("/vote")({
   component: RouteComponent,
@@ -20,20 +23,50 @@ export const Route = createFileRoute("/vote")({
 // }
 
 export default function RouteComponent() {
-  // const { fingerprint, isLoading } = useFingerprint();
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ["projects"],
+    queryFn: async ({ pageParam }) =>
+      await getWrestlers({
+        data: { cursor: pageParam, pageSize: 2, search: "" },
+      }),
+    initialPageParam: "",
+    getNextPageParam: (lastPage, pages) => lastPage.pagination.lastCursor,
+  });
 
-  return (
-    <div>
-      <h1>Welcome to the Fingerprinting Page!</h1>
-
-      {/* <Show when={isLoading()} fallback={<p>{fingerprint()}</p>}>
-        <p>Loading fingerprint...</p>
-      </Show> */}
-
-      <p>
-        This fingerprint is generated client-side using{" "}
-        <code>@fingerprintjs/fingerprintjs</code>.
-      </p>
-    </div>
+  return status === "pending" ? (
+    <p>Loading...</p>
+  ) : status === "error" ? (
+    <p>Error: {error.message}</p>
+  ) : (
+    <>
+      {data.pages.map((group, i) => (
+        <React.Fragment key={i}>
+          {group.data.map((project) => (
+            <p key={project.id}>{`${project.name} | ${project.school}`}</p>
+          ))}
+        </React.Fragment>
+      ))}
+      <div>
+        <button
+          onClick={() => fetchNextPage()}
+          disabled={!hasNextPage || isFetching}
+        >
+          {isFetchingNextPage
+            ? "Loading more..."
+            : hasNextPage
+              ? "Load More"
+              : "Nothing more to load"}
+        </button>
+      </div>
+      <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
+    </>
   );
 }

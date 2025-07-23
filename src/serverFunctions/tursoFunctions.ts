@@ -1,19 +1,19 @@
 import { asc, count, eq, getTableColumns, gt, sql } from "drizzle-orm";
 import { db } from "../db/index";
 import { wrestlersSelectSchema, wrestlersTable } from "../db/schema";
-import { redirect } from "@tanstack/solid-router";
+import { redirect } from "@tanstack/react-router";
 import { ActionFailedError } from "@/lib/errors";
-import { createServerFn } from "@tanstack/solid-start";
+import { createServerFn } from "@tanstack/react-start";
 
 type GetWrestlers = {
-  cursor?: string;
+  cursor: string;
   pageSize?: number;
   search?: string;
 };
 
 export const getWrestlers = createServerFn({ method: "GET" })
   .validator((data: GetWrestlers) => ({
-    cursor: data.cursor ?? "",
+    cursor: data.cursor,
     pageSize: data.pageSize ?? 2,
     search: data.search ?? "",
   }))

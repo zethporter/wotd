@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/libsql";
 
 export const db = drizzle({
   connection: {
-    url: import.meta.env.TURSO_CONNECTION_URL!,
-    authToken: import.meta.env.TURSO_AUTH_TOKEN!,
+    url: process.env.TURSO_CONNECTION_URL!,
+    authToken: process.env.TURSO_AUTH_TOKEN!,
   },
 });
