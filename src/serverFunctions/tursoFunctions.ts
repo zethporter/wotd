@@ -1,4 +1,4 @@
-import { asc, count, eq, getTableColumns, gt, sql } from "drizzle-orm";
+import { asc, count, eq, getTableColumns, gt, sql, or } from "drizzle-orm";
 import { db } from "../db/index";
 import { wrestlersSelectSchema, wrestlersTable } from "../db/schema";
 import { redirect } from "@tanstack/react-router";
@@ -28,8 +28,13 @@ export const getWrestlers = createServerFn({ method: "GET" })
       .limit(pageSize);
 
     if (search) {
-      query.where(sql`${wrestlersTable.name} LIKE ${"%" + search + "%"}`);
-      query.where(sql`${wrestlersTable.school} LIKE ${"%" + search + "%"}`);
+      console.log("Searching for: ", search);
+      query.where(
+        or(
+          sql`${wrestlersTable.name} LIKE ${"%" + search + "%"}`,
+          sql`${wrestlersTable.school} LIKE ${"%" + search + "%"}`,
+        ),
+      );
     }
     if (cursor) {
       // If a cursor is provided, fetch records where the ID is greater than the cursor

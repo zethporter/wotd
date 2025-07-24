@@ -1,28 +1,50 @@
-import React from "react";
+import { useState, Fragment } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
-// import { createResource, Show } from "solid-js";
 import { useFingerprint } from "@/components/fingerprint-provider";
 import { getWrestlers } from "@/serverFunctions/tursoFunctions";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useDebouncedValue } from "@tanstack/react-pacer";
 
 export const Route = createFileRoute("/vote")({
   component: RouteComponent,
 });
-// src/routes/index.tsx
-
-// Function to generate the fingerprint
-// This function will only be executed on the client
-// async function getFingerprint() {
-//   if (typeof window !== "undefined") {
-//     const FingerprintJS = await import("@fingerprintjs/fingerprintjs");
-//     const fp = await FingerprintJS.load();
-//     const result = await fp.get();
-//     return result.visitorId;
-//   }
-//   return null; // Return null if not on the client
-// }
 
 export default function RouteComponent() {
+  const [wrestlerId, setWrestlerId] = useState<string | null>(null);
+  const [search, setSearch] = useState<string>("");
+  const [debouncedValue] = useDebouncedValue(search, {
+    wait: 1000,
+  });
+
+  return (
+    <VoteContent
+      wrestlerId={wrestlerId}
+      setWrestlerId={setWrestlerId}
+      search={search}
+      setSearch={setSearch}
+      searchValue={debouncedValue}
+    />
+  );
+}
+
+const VoteContent = ({
+  wrestlerId,
+  setWrestlerId,
+  search,
+  setSearch,
+  searchValue,
+}: {
+  wrestlerId: string | null;
+  setWrestlerId: React.Dispatch<React.SetStateAction<string | null>>;
+  search: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+  searchValue: string;
+}) => {
   const {
     data,
     error,
@@ -32,41 +54,65 @@ export default function RouteComponent() {
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ["projects"],
-    queryFn: async ({ pageParam }) =>
+    queryKey: ["projects", searchValue],
+    queryFn: async ({ pageParam, queryKey }) =>
       await getWrestlers({
-        data: { cursor: pageParam, pageSize: 2, search: "" },
+        data: { cursor: pageParam, pageSize: 2, search: queryKey[1] },
       }),
     initialPageParam: "",
     getNextPageParam: (lastPage, pages) => lastPage.pagination.lastCursor,
   });
 
-  return status === "pending" ? (
-    <p>Loading...</p>
-  ) : status === "error" ? (
-    <p>Error: {error.message}</p>
-  ) : (
-    <>
-      {data.pages.map((group, i) => (
-        <React.Fragment key={i}>
-          {group.data.map((project) => (
-            <p key={project.id}>{`${project.name} | ${project.school}`}</p>
-          ))}
-        </React.Fragment>
-      ))}
+  if (status === "pending") {
+    return <p>Loading...</p>;
+  }
+  if (status === "error") {
+    return <p>Error: {error.message}</p>;
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 h-screen">
+      <Input
+        className="container mx-auto text-center"
+        value={search}
+        placeholder="Search for a wrestler or school"
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <RadioGroup value={wrestlerId} onValueChange={(e) => setWrestlerId(e)}>
+        {data.pages.map((group, i) =>
+          group.data.map((wrestler) => (
+            <div key={wrestler.id} className="flex items-center gap-3">
+              <RadioGroupItem
+                className="size-6"
+                value={wrestler.id}
+                id={wrestler.id}
+              />
+              <Label className="text-xl" htmlFor={wrestler.id}>
+                <span className="font-semibold">{wrestler.name}</span>
+                <Badge className="text-sm" variant="outline">
+                  {wrestler.school}
+                </Badge>
+              </Label>
+            </div>
+          )),
+        )}
+      </RadioGroup>
       <div>
-        <button
+        <Button
           onClick={() => fetchNextPage()}
           disabled={!hasNextPage || isFetching}
+          variant="destructive"
         >
           {isFetchingNextPage
             ? "Loading more..."
             : hasNextPage
               ? "Load More"
               : "Nothing more to load"}
-        </button>
+        </Button>
       </div>
+      <p>{wrestlerId}</p>
+      <p>{search}</p>
       <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
-    </>
+    </div>
   );
-}
+};
