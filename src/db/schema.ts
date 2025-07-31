@@ -1,10 +1,11 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createSelectSchema, createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const votersTable = sqliteTable("voters", {
   id: text("id").primaryKey(),
-  fingerptint: text("fingerptint").notNull(),
+  fingerprint: text("fingerprint").notNull(),
   email: text("email"),
   createdAt: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
@@ -36,3 +37,4 @@ export const votesTable = sqliteTable("votes", {
 });
 export const votesSelectSchema = createSelectSchema(votesTable);
 export const votesInsertSchema = createInsertSchema(votesTable);
+export type VotesInsert = z.infer<typeof votesInsertSchema>;

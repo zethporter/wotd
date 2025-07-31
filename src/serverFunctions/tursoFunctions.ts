@@ -1,9 +1,17 @@
 import { asc, count, eq, getTableColumns, gt, sql, or } from "drizzle-orm";
 import { db } from "../db/index";
-import { wrestlersSelectSchema, wrestlersTable } from "../db/schema";
+import {
+  wrestlersSelectSchema,
+  wrestlersTable,
+  votersInsertSchema,
+  votesInsertSchema,
+  type VotesInsert,
+  votesTable,
+  votersTable,
+} from "../db/schema";
 import { redirect } from "@tanstack/react-router";
-import { ActionFailedError } from "@/lib/errors";
 import { createServerFn } from "@tanstack/react-start";
+import { v7 as uuid } from "uuid";
 
 type GetWrestlers = {
   cursor: string;
@@ -20,7 +28,6 @@ export const getWrestlers = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { cursor, pageSize, search } = data;
 
-    console.log("Running handler for `getWrestlers");
     const query = db
       .select()
       .from(wrestlersTable)
@@ -28,7 +35,6 @@ export const getWrestlers = createServerFn({ method: "GET" })
       .limit(pageSize);
 
     if (search) {
-      console.log("Searching for: ", search);
       query.where(
         or(
           sql`${wrestlersTable.name} LIKE ${"%" + search + "%"}`,
@@ -42,11 +48,6 @@ export const getWrestlers = createServerFn({ method: "GET" })
     }
 
     const wrestlers = await query.execute();
-
-    console.log(
-      "Ran query to get wrestlers",
-      JSON.stringify(wrestlers, null, 2),
-    );
 
     // Determine the next cursor. If there are wrestlers, it's the ID of the last one.
     // Otherwise, if the number of fetched wrestlers is less than pageSize, there are no more pages.
@@ -63,4 +64,46 @@ export const getWrestlers = createServerFn({ method: "GET" })
       },
       search,
     };
+  });
+
+export type Vote = {
+  wrestlerId: string;
+  fingerprint: string;
+};
+
+export const submitVote = createServerFn({ method: "POST" })
+  .validator((data: Vote) => data)
+  .handler(async ({ data }) => {
+    const query = db
+      .select()
+      .from(votersTable)
+      .where(eq(votersTable.fingerprint, data.fingerprint));
+    const voter = await query.execute();
+    console.log("voter response", JSON.stringify({ voter }, null, 2));
+    if (voter.length > 0) {
+      throw redirect({
+        to: "/already-voted",
+      });
+    }
+
+    const voterRes = await db
+      .insert(votersTable)
+      .values({
+        id: uuid(),
+        fingerprint: data.fingerprint,
+        email: "None",
+        votedOn: new Date().toISOString(),
+      })
+      .returning({ voterId: votersTable.id });
+
+    const { voterId } = voterRes[0]!;
+
+    await db.insert(votesTable).values({
+      id: uuid(),
+      wrestlerId: data.wrestlerId,
+      voterId: voterId,
+    });
+    throw redirect({
+      to: "/voted",
+    });
   });

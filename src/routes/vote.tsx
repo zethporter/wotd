@@ -2,7 +2,7 @@ import { useState, Fragment } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useFingerprint } from "@/components/fingerprint-provider";
-import { getWrestlers } from "@/serverFunctions/tursoFunctions";
+import { getWrestlers, submitVote } from "@/serverFunctions/tursoFunctions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/vote")({
 });
 
 export default function RouteComponent() {
+  const { fingerprint } = useFingerprint();
   const [wrestlerId, setWrestlerId] = useState<string | null>(null);
   const [search, setSearch] = useState<string>("");
   const [debouncedValue] = useDebouncedValue(search, {
@@ -28,6 +29,7 @@ export default function RouteComponent() {
       search={search}
       setSearch={setSearch}
       searchValue={debouncedValue}
+      fingerprint={fingerprint}
     />
   );
 }
@@ -38,12 +40,14 @@ const VoteContent = ({
   search,
   setSearch,
   searchValue,
+  fingerprint,
 }: {
   wrestlerId: string | null;
   setWrestlerId: React.Dispatch<React.SetStateAction<string | null>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   searchValue: string;
+  fingerprint: string | null;
 }) => {
   const {
     data,
@@ -112,7 +116,19 @@ const VoteContent = ({
       </div>
       <p>{wrestlerId}</p>
       <p>{search}</p>
+      <p>{fingerprint}</p>
       <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
+      <Button
+        type="button"
+        disabled={!wrestlerId || !fingerprint}
+        onClick={() =>
+          submitVote({
+            data: { wrestlerId: wrestlerId!, fingerprint: fingerprint! },
+          })
+        }
+      >
+        Vote!
+      </Button>
     </div>
   );
 };
