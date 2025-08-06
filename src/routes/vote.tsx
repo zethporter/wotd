@@ -1,14 +1,20 @@
 import { useState, Fragment } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useFingerprint } from "@/components/fingerprint-provider";
-import { getWrestlers, submitVote } from "@/serverFunctions/tursoFunctions";
+import {
+  getWrestlers as gw,
+  submitVote as sv,
+} from "@/serverFunctions/tursoFunctions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useDebouncedValue } from "@tanstack/react-pacer";
+import { twMerge } from "tailwind-merge";
+import clsx from "clsx";
 
 export const Route = createFileRoute("/vote")({
   component: RouteComponent,
@@ -49,6 +55,8 @@ const VoteContent = ({
   searchValue: string;
   fingerprint: string | null;
 }) => {
+  const getWrestlers = useServerFn(gw);
+  const submitVote = useServerFn(sv);
   const {
     data,
     error,
@@ -61,7 +69,7 @@ const VoteContent = ({
     queryKey: ["projects", searchValue],
     queryFn: async ({ pageParam, queryKey }) =>
       await getWrestlers({
-        data: { cursor: pageParam, pageSize: 2, search: queryKey[1] },
+        data: { cursor: pageParam, pageSize: 20, search: queryKey[1] },
       }),
     initialPageParam: "",
     getNextPageParam: (lastPage, pages) => lastPage.pagination.lastCursor,
@@ -77,7 +85,7 @@ const VoteContent = ({
   return (
     <div className="flex flex-col items-center justify-center gap-4 h-screen">
       <Input
-        className="container mx-auto text-center"
+        className="w-2xl max-w-10/12 mx-auto text-center"
         value={search}
         placeholder="Search for a wrestler or school"
         onChange={(e) => setSearch(e.target.value)}
@@ -106,17 +114,11 @@ const VoteContent = ({
           onClick={() => fetchNextPage()}
           disabled={!hasNextPage || isFetching}
           variant="destructive"
+          className={twMerge(clsx(hasNextPage ? "" : "hidden"))}
         >
-          {isFetchingNextPage
-            ? "Loading more..."
-            : hasNextPage
-              ? "Load More"
-              : "Nothing more to load"}
+          {isFetchingNextPage ? "Loading more..." : "Load More"}
         </Button>
       </div>
-      <p>{wrestlerId}</p>
-      <p>{search}</p>
-      <p>{fingerprint}</p>
       <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
       <Button
         type="button"
