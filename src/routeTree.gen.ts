@@ -8,13 +8,18 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createServerRootRoute } from '@tanstack/react-start/server'
+
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VotedRouteImport } from './routes/voted'
 import { Route as VoteRouteImport } from './routes/vote'
-import { Route as UploadWrestlersRouteImport } from './routes/upload-wrestlers'
+import { Route as ManageRouteImport } from './routes/manage'
 import { Route as EnterVoteCodeRouteImport } from './routes/enter-vote-code'
 import { Route as AlreadyVotedRouteImport } from './routes/already-voted'
 import { Route as IndexRouteImport } from './routes/index'
+import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
+
+const rootServerRouteImport = createServerRootRoute()
 
 const VotedRoute = VotedRouteImport.update({
   id: '/voted',
@@ -26,9 +31,9 @@ const VoteRoute = VoteRouteImport.update({
   path: '/vote',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UploadWrestlersRoute = UploadWrestlersRouteImport.update({
-  id: '/upload-wrestlers',
-  path: '/upload-wrestlers',
+const ManageRoute = ManageRouteImport.update({
+  id: '/manage',
+  path: '/manage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnterVoteCodeRoute = EnterVoteCodeRouteImport.update({
@@ -46,12 +51,17 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/already-voted': typeof AlreadyVotedRoute
   '/enter-vote-code': typeof EnterVoteCodeRoute
-  '/upload-wrestlers': typeof UploadWrestlersRoute
+  '/manage': typeof ManageRoute
   '/vote': typeof VoteRoute
   '/voted': typeof VotedRoute
 }
@@ -59,7 +69,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/already-voted': typeof AlreadyVotedRoute
   '/enter-vote-code': typeof EnterVoteCodeRoute
-  '/upload-wrestlers': typeof UploadWrestlersRoute
+  '/manage': typeof ManageRoute
   '/vote': typeof VoteRoute
   '/voted': typeof VotedRoute
 }
@@ -68,7 +78,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/already-voted': typeof AlreadyVotedRoute
   '/enter-vote-code': typeof EnterVoteCodeRoute
-  '/upload-wrestlers': typeof UploadWrestlersRoute
+  '/manage': typeof ManageRoute
   '/vote': typeof VoteRoute
   '/voted': typeof VotedRoute
 }
@@ -78,7 +88,7 @@ export interface FileRouteTypes {
     | '/'
     | '/already-voted'
     | '/enter-vote-code'
-    | '/upload-wrestlers'
+    | '/manage'
     | '/vote'
     | '/voted'
   fileRoutesByTo: FileRoutesByTo
@@ -86,7 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/already-voted'
     | '/enter-vote-code'
-    | '/upload-wrestlers'
+    | '/manage'
     | '/vote'
     | '/voted'
   id:
@@ -94,7 +104,7 @@ export interface FileRouteTypes {
     | '/'
     | '/already-voted'
     | '/enter-vote-code'
-    | '/upload-wrestlers'
+    | '/manage'
     | '/vote'
     | '/voted'
   fileRoutesById: FileRoutesById
@@ -103,9 +113,30 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AlreadyVotedRoute: typeof AlreadyVotedRoute
   EnterVoteCodeRoute: typeof EnterVoteCodeRoute
-  UploadWrestlersRoute: typeof UploadWrestlersRoute
+  ManageRoute: typeof ManageRoute
   VoteRoute: typeof VoteRoute
   VotedRoute: typeof VotedRoute
+}
+export interface FileServerRoutesByFullPath {
+  '/api/auth/$': typeof ApiAuthSplatServerRoute
+}
+export interface FileServerRoutesByTo {
+  '/api/auth/$': typeof ApiAuthSplatServerRoute
+}
+export interface FileServerRoutesById {
+  __root__: typeof rootServerRouteImport
+  '/api/auth/$': typeof ApiAuthSplatServerRoute
+}
+export interface FileServerRouteTypes {
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath
+  fullPaths: '/api/auth/$'
+  fileServerRoutesByTo: FileServerRoutesByTo
+  to: '/api/auth/$'
+  id: '__root__' | '/api/auth/$'
+  fileServerRoutesById: FileServerRoutesById
+}
+export interface RootServerRouteChildren {
+  ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -124,11 +155,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VoteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/upload-wrestlers': {
-      id: '/upload-wrestlers'
-      path: '/upload-wrestlers'
-      fullPath: '/upload-wrestlers'
-      preLoaderRoute: typeof UploadWrestlersRouteImport
+    '/manage': {
+      id: '/manage'
+      path: '/manage'
+      fullPath: '/manage'
+      preLoaderRoute: typeof ManageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/enter-vote-code': {
@@ -154,15 +185,32 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+declare module '@tanstack/react-start/server' {
+  interface ServerFileRoutesByPath {
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+  }
+}
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlreadyVotedRoute: AlreadyVotedRoute,
   EnterVoteCodeRoute: EnterVoteCodeRoute,
-  UploadWrestlersRoute: UploadWrestlersRoute,
+  ManageRoute: ManageRoute,
   VoteRoute: VoteRoute,
   VotedRoute: VotedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+}
+export const serverRouteTree = rootServerRouteImport
+  ._addFileChildren(rootServerRouteChildren)
+  ._addFileTypes<FileServerRouteTypes>()

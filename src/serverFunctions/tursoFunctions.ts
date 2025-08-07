@@ -1,5 +1,5 @@
 import { asc, count, eq, getTableColumns, gt, sql, or } from "drizzle-orm";
-import { db } from "../db/index";
+import { db } from "../db/app";
 import {
   wrestlersSelectSchema,
   wrestlersTable,
@@ -8,7 +8,7 @@ import {
   type VotesInsert,
   votesTable,
   votersTable,
-} from "../db/schema";
+} from "../db/schema/app";
 import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { v7 as uuid } from "uuid";
