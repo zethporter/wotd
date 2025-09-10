@@ -19,6 +19,22 @@ type GetWrestlers = {
   search?: string;
 };
 
+export const getAllWrestlers = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const query = db.select().from(wrestlersTable);
+    const wrestlers = await query.execute();
+    return { data: wrestlers };
+  },
+);
+
+export const getAllVotes = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const query = db.select().from(votesTable);
+    const votes = await query.execute();
+    return { data: votes };
+  },
+);
+
 export const getWrestlers = createServerFn({ method: "GET" })
   .validator((data: GetWrestlers) => ({
     cursor: data.cursor,

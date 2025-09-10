@@ -12,9 +12,24 @@ import { FingerprintProvider } from "@/components/fingerprint-provider";
 import { ModeToggle } from "@/components/mode-toggle";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createDB } from "@tanstack/react-db";
+import { getAllWrestlers, getAllVotes } from "@/serverFunctions/tursoFunctions";
 
 // Create a client
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
+
+// Create TanStack DB instance
+export const db = createDB({
+  queryClient,
+  queries: {
+    wrestlers: {
+      queryFn: getAllWrestlers,
+    },
+    votes: {
+      queryFn: getAllVotes,
+    },
+  },
+});
 
 import appCss from "@/styles/app.css?url";
 
