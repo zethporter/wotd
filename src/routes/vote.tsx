@@ -15,6 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { useDebouncedValue } from "@tanstack/react-pacer";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
+import { wrestlersCollection } from "./__root";
+import { useLiveQuery } from "@tanstack/react-db";
 
 export const Route = createFileRoute("/vote")({
   component: RouteComponent,
@@ -55,44 +57,57 @@ const VoteContent = ({
   searchValue: string;
   fingerprint: string | null;
 }) => {
-  const getWrestlers = useServerFn(gw);
+  // const getWrestlers = useServerFn(gw);
   const submitVote = useServerFn(sv);
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery({
-    queryKey: ["projects", searchValue],
-    queryFn: async ({ pageParam, queryKey }) =>
-      await getWrestlers({
-        data: { cursor: pageParam, pageSize: 20, search: queryKey[1] },
-      }),
-    initialPageParam: "",
-    getNextPageParam: (lastPage, pages) => lastPage.pagination.lastCursor,
-  });
+  // const {
+  //   data,
+  //   error,
+  //   fetchNextPage,
+  //   hasNextPage,
+  //   isFetching,
+  //   isFetchingNextPage,
+  //   status,
+  // } = useInfiniteQuery({
+  //   queryKey: ["projects", searchValue],
+  //   queryFn: async ({ pageParam, queryKey }) =>
+  //     await getWrestlers({
+  //       data: { cursor: pageParam, pageSize: 20, search: queryKey[1] },
+  //     }),
+  //   initialPageParam: "",
+  //   getNextPageParam: (lastPage, pages) => lastPage.pagination.lastCursor,
+  // });
 
-  if (status === "pending") {
-    return <p>Loading...</p>;
-  }
-  if (status === "error") {
-    return <p>Error: {error.message}</p>;
-  }
+  // if (status === "pending") {
+  //   return <p>Loading...</p>;
+  // }
+  // if (status === "error") {
+  //   return <p>Error: {error.message}</p>;
+  // }
+
+  const { data } = useLiveQuery((q) =>
+    q.from({ wrestler: wrestlersCollection }),
+  );
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 h-screen">
       <Input
-        className="w-2xl max-w-10/12 mx-auto text-center"
+        className="w-2xl max-w-10/12 mx-auto text-center fixed top-36"
         value={search}
         placeholder="Search for a wrestler or school"
         onChange={(e) => setSearch(e.target.value)}
       />
       <RadioGroup value={wrestlerId} onValueChange={(e) => setWrestlerId(e)}>
-        {data.pages.map((group, i) =>
-          group.data.map((wrestler) => (
+        {data
+          .filter((wrestler) => {
+            if (search === "" || search === null) {
+              return true;
+            }
+            return (
+              wrestler.name.toLowerCase().includes(search.toLowerCase()) ||
+              wrestler.school.toLowerCase().includes(search.toLowerCase())
+            );
+          })
+          .map((wrestler) => (
             <div key={wrestler.id} className="flex items-center gap-3">
               <RadioGroupItem
                 className="size-6"
@@ -106,10 +121,9 @@ const VoteContent = ({
                 </Badge>
               </Label>
             </div>
-          )),
-        )}
+          ))}
       </RadioGroup>
-      <div>
+      {/*<div>
         <Button
           onClick={() => fetchNextPage()}
           disabled={!hasNextPage || isFetching}
@@ -119,7 +133,7 @@ const VoteContent = ({
           {isFetchingNextPage ? "Loading more..." : "Load More"}
         </Button>
       </div>
-      <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
+      <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>*/}
       <Button
         type="button"
         disabled={!wrestlerId || !fingerprint}

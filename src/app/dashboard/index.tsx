@@ -5,10 +5,18 @@ import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useMemo } from "react";
+import { useLiveQuery } from "@tanstack/react-db";
+import { wrestlersCollection, votesCollection } from "@/routes/__root";
 
-import data from "./data.json";
+// import data from "./data.json";
 
 export default function Page() {
+  const { data: wrestlers } = useLiveQuery((q) =>
+    q.from({ wrestler: wrestlersCollection }),
+  );
+  const { data: votes } = useLiveQuery((q) =>
+    q.from({ vote: votesCollection }),
+  );
   return (
     <SidebarProvider
       style={
@@ -28,7 +36,8 @@ export default function Page() {
               <div className="px-4 lg:px-6">
                 <ChartAreaInteractive />
               </div>
-              <DataTable data={data} />
+              <pre>{JSON.stringify(votes, null, 2)}</pre>
+              {/*<DataTable data={data} />*/}
             </div>
           </div>
         </div>
