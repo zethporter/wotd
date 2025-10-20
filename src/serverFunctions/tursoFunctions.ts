@@ -36,7 +36,7 @@ export const getAllVotes = createServerFn({ method: "GET" }).handler(
 );
 
 export const getWrestlers = createServerFn({ method: "GET" })
-  .validator((data: GetWrestlers) => ({
+  .inputValidator((data: GetWrestlers) => ({
     cursor: data.cursor,
     pageSize: data.pageSize ?? 2,
     search: data.search ?? "",
@@ -88,7 +88,7 @@ export type Vote = {
 };
 
 export const submitVote = createServerFn({ method: "POST" })
-  .validator((data: Vote) => data)
+  .inputValidator((data: Vote) => data)
   .handler(async ({ data }) => {
     const query = db
       .select()

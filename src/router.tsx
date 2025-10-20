@@ -1,23 +1,19 @@
 // src/router.tsx
-import {
-  createRouter as createTanStackRouter,
-  ErrorComponent,
-} from "@tanstack/react-router";
+import { createRouter, ErrorComponent } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
-export function createRouter() {
-  const router = createTanStackRouter({
+export function getRouter() {
+  const router = createRouter({
     defaultPreload: "intent",
     routeTree,
     defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
+    defaultNotFoundComponent: () => (
+      <div>
+        <h1>Uh oh!</h1>
+      </div>
+    ),
     scrollRestoration: true,
   });
 
   return router;
-}
-
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: ReturnType<typeof createRouter>;
-  }
 }
