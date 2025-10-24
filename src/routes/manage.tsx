@@ -12,7 +12,11 @@ function RouteComponent() {
   if (!session) {
     return (
       <div>
-        <Button onClick={() => signIn.social({ provider: "google" })}>
+        <Button
+          onClick={() =>
+            signIn.social({ provider: "google", callbackURL: "/manage" })
+          }
+        >
           Sign In with google
         </Button>
       </div>

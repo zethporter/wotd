@@ -5,17 +5,36 @@ import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useMemo } from "react";
-import { useLiveQuery } from "@tanstack/react-db";
+import { useLiveQuery, count, eq } from "@tanstack/react-db";
 import { wrestlersCollection, votesCollection } from "@/routes/__root";
 
 // import data from "./data.json";
 
 export default function Page() {
-  const { data: wrestlers } = useLiveQuery((q) =>
-    q.from({ wrestler: wrestlersCollection }),
-  );
+  const { data: wrestlers } = useLiveQuery((q) => {
+    const votes = q
+      .from({ vote: votesCollection })
+      .groupBy(({ vote }) => vote.wrestlerId)
+      .select(({ vote }) => ({
+        wrestlerId: vote.wrestlerId,
+        totalVotes: count(vote.id),
+      }));
+    const wrestlers = q
+      .from({ wrestler: wrestlersCollection })
+      .rightJoin({ votes }, ({ wrestler, votes }) => {
+        return eq(wrestler.id, votes.wrestlerId);
+      })
+      .orderBy(({ votes }) => votes.totalVotes);
+
+    return q.from({ wrestlers });
+  });
   const { data: votes } = useLiveQuery((q) =>
-    q.from({ vote: votesCollection }),
+    q
+      .from({ vote: votesCollection })
+      .select(({ vote }) => ({
+        totalVotes: count(vote.id),
+      }))
+      .findOne(),
   );
   return (
     <SidebarProvider
@@ -32,12 +51,15 @@ export default function Page() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards />
-              <div className="px-4 lg:px-6">
-                <ChartAreaInteractive />
-              </div>
-              <pre>{JSON.stringify(votes, null, 2)}</pre>
-              {/*<DataTable data={data} />*/}
+              <SectionCards
+                totalVotes={votes?.totalVotes ?? 0}
+                wrestler={
+                  wrestlers.length > 0 ? wrestlers[0]!.wrestler : undefined
+                }
+              />
+              <DataTable
+                data={wrestlers.filter((w) => w.wrestler !== undefined) as any}
+              />
             </div>
           </div>
         </div>
