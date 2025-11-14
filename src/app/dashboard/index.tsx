@@ -1,5 +1,4 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { DataTable } from "@/components/data-table";
 import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
@@ -7,6 +6,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useMemo } from "react";
 import { useLiveQuery, count, eq } from "@tanstack/react-db";
 import { wrestlersCollection, votesCollection } from "@/routes/__root";
+import { nullishWrestler } from "@/schema";
 
 // import data from "./data.json";
 
@@ -54,7 +54,9 @@ export default function Page() {
               <SectionCards
                 totalVotes={votes?.totalVotes ?? 0}
                 wrestler={
-                  wrestlers.length > 0 ? wrestlers[0]!.wrestler : undefined
+                  wrestlers.length > 0
+                    ? nullishWrestler.parse(wrestlers[0]!.wrestler)
+                    : null
                 }
               />
               <DataTable

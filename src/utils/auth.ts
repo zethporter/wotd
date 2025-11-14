@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { twoFactor, oneTap } from "better-auth/plugins";
+import { twoFactor, oneTap, organization, admin } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
 import { db } from "@/db/auth"; // your drizzle instance
 import * as schema from "@/db/schema/auth";
@@ -24,5 +24,13 @@ export const auth = betterAuth({
       // propt: "select_account consent"
     },
   },
-  plugins: [twoFactor(), oneTap(), reactStartCookies()],
+  plugins: [
+    twoFactor(),
+    oneTap(),
+    reactStartCookies(),
+    organization(),
+    admin({
+      adminUserIds: ["RHwN7O1v7PbwkBc7bJuf9lOiQP67UB7e"],
+    }),
+  ],
 });

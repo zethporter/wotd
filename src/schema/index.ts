@@ -4,8 +4,8 @@ export const voter = z.object({
   _id: z.string().nullish(),
   id: z.string(),
   email: z.string(),
-  created: z.string().date(),
-  voted: z.string().date().nullable(),
+  created: z.iso.date(),
+  voted: z.iso.date().nullable(),
 });
 export type Voter = z.infer<typeof voter>;
 
@@ -21,6 +21,8 @@ export const wrestler = z.object({
   name: z.string(),
   school: z.string(),
 });
+export const nullishWrestler = wrestler.nullish();
 export type Wrestler = z.infer<typeof wrestler>;
+export type NullishWrestler = z.infer<typeof nullishWrestler>;
 
 export const a_wrestler = z.array(wrestler);
