@@ -4,9 +4,9 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
-  IconDotsVertical,
-  IconTrash,
   IconEdit,
+  IconTrashX,
+  IconDeviceFloppy,
 } from "@tabler/icons-react";
 import {
   type ColumnDef,
@@ -32,6 +32,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import {
@@ -49,6 +52,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export const schema = z.object({
   wrestler: z.object({
@@ -100,32 +108,57 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     id: "actions",
-    cell: () => (
-      <div className="flex w-full justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem>
-              <IconEdit />
-              <span>Edit</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive">
-              <IconTrash />
-              <span>Delete</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const [name, setName] = React.useState(row.original.wrestler.name);
+      const [school, setSchool] = React.useState(row.original.wrestler.school);
+      return (
+        <div className="flex w-full justify-end">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon">
+                <IconEdit />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="left" align="center" className="w-80">
+              <div className="grid gap-4">
+                <div className="space-y-2 flex justify-between">
+                  <h4 className="leading-none font-bold text-xl flex gap-1 items-center">
+                    <IconEdit />
+                    <span>Edit</span>
+                  </h4>
+                  <Button size="icon" variant="destructive">
+                    <IconTrashX />
+                  </Button>
+                </div>
+                <div className="grid gap-2">
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="width">Name</Label>
+                    <Input
+                      defaultValue="100%"
+                      className="col-span-2 h-8"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="maxWidth">School</Label>
+                    <Input
+                      defaultValue="300px"
+                      className="col-span-2 h-8"
+                      value={school}
+                      onChange={(e) => setSchool(e.target.value)}
+                    />
+                  </div>
+                  <Button size="default" variant="secondary">
+                    <IconDeviceFloppy /> <span>Save</span>
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      );
+    },
   },
 ];
 
@@ -219,9 +252,9 @@ export function DataTable({
             ))}
           </TableHeader>
           <TableBody className="**:data-[slot=table-cell]:first:w-8">
-            {table.getRowModel().rows?.length ? (
+            {table.getPaginationRowModel().rows?.length ? (
               <React.Fragment>
-                {table.getRowModel().rows.map((row) => (
+                {table.getPaginationRowModel().rows.map((row) => (
                   <DraggableRow key={row.id} row={row} />
                 ))}
               </React.Fragment>

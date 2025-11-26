@@ -74,7 +74,7 @@ function RootComponent() {
   return (
     <RootDocument>
       <Outlet />
-      <TanStackRouterDevtools position="top-right" />
+      <TanStackRouterDevtools position="bottom-right" />
     </RootDocument>
   );
 }

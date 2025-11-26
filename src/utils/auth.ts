@@ -1,9 +1,11 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { twoFactor, oneTap, organization, admin } from "better-auth/plugins";
-import { reactStartCookies } from "better-auth/react-start";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { db } from "@/db/auth"; // your drizzle instance
 import * as schema from "@/db/schema/auth";
+import { adminClient } from "better-auth/client/plugins";
+import { ac, manager } from "./permissions";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -27,10 +29,18 @@ export const auth = betterAuth({
   plugins: [
     twoFactor(),
     oneTap(),
-    reactStartCookies(),
+    tanstackStartCookies(),
     organization(),
     admin({
       adminUserIds: ["RHwN7O1v7PbwkBc7bJuf9lOiQP67UB7e"],
+      plugins: [
+        adminClient({
+          ac,
+          roles: {
+            manager,
+          },
+        }),
+      ],
     }),
   ],
 });
