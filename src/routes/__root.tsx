@@ -14,10 +14,16 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createCollection } from "@tanstack/react-db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { getAllWrestlers, getAllVotes } from "@/serverFunctions/tursoFunctions";
+import {
+  getAllWrestlers,
+  getAllVotes,
+  updateWrestler,
+  addWrestlers,
+} from "@/serverFunctions/tursoFunctions";
 import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "@/styles/app.css?url";
+import { toast } from "sonner";
 // Create a client
 export const queryClient = new QueryClient();
 
@@ -31,6 +37,36 @@ export const wrestlersCollection = createCollection(
     },
     queryClient,
     getKey: (item) => item.id,
+    onInsert: async ({ transaction }) => {
+      const newWrestlers = transaction.mutations.map((m) => m.modified);
+      const response = await addWrestlers({ data: newWrestlers });
+      if (response.code === 200) {
+        toast.success(response.message);
+        return response.data;
+      }
+      if (response.code === 500) {
+        toast.error(response.message);
+        return { refetch: false };
+      }
+      toast.info("Something went wrong");
+      return { refetch: false };
+    },
+    onUpdate: async ({ transaction }) => {
+      const wrestlers = transaction.mutations.map((m) => ({
+        id: m.key,
+        changes: m.changes,
+      }));
+      for (const wrestler of wrestlers) {
+        await updateWrestler({
+          data: { id: wrestler.id, newValues: wrestler.changes },
+        });
+      }
+    },
+    // onDelete: async ({ transaction }) => {
+    //       const ids = transaction.mutations.map((m) => m.key)
+    //       await api.deleteTodos(ids)
+    //     },
+    //   })
   }),
 );
 

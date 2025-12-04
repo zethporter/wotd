@@ -7,6 +7,8 @@ import {
   IconEdit,
   IconTrashX,
   IconDeviceFloppy,
+  IconPlus,
+  IconUserPlus,
 } from "@tabler/icons-react";
 import {
   type ColumnDef,
@@ -47,24 +49,17 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  PopoverClose,
 } from "@/components/ui/popover";
-import { updateWrestler as uw } from "@/serverFunctions/tursoFunctions";
 import type { WrestlerInsert } from "@/db/schema/app";
+import { wrestlersCollection } from "@/routes/__root";
 
-const updateWrestler = async (wrestler: WrestlerInsert) => {
-  toast.loading("Saving wrestler...", { id: wrestler.id });
-  try {
-    const response = await uw({ data: wrestler });
-    if (response.code === "SUCCESS") {
-      toast.success(response.message, { id: wrestler.id });
-    } else if (response.code === "WARN") {
-      toast.warning(response.message, { id: wrestler.id });
-    } else {
-      toast.info("hmm...", { id: wrestler.id });
-    }
-  } catch {
-    toast.error("Failed to save wrestler", { id: wrestler.id });
-  }
+const updateWrestler = (wrestler: WrestlerInsert) => {
+  wrestlersCollection.update(wrestler.id, (w) => {
+    w.id = wrestler.id;
+    w.name = wrestler.name;
+    w.school = wrestler.school;
+  });
 };
 
 export const schema = z.object({
@@ -78,6 +73,69 @@ export const schema = z.object({
     totalVotes: z.number(),
   }),
 });
+
+const AddWrestlerPopover = () => {
+  const [name, setName] = React.useState("");
+  const [school, setSchool] = React.useState("");
+  return (
+    <div className="flex w-full justify-end">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="icon">
+            <IconUserPlus />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent side="right" align="center" className="w-80">
+          <div className="grid gap-4">
+            <div className="space-y-2 flex justify-between">
+              <h4 className="leading-none font-bold text-xl flex gap-1 items-center">
+                <IconUserPlus />
+                <span>Add</span>
+              </h4>
+            </div>
+            <div className="grid gap-2">
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label htmlFor="width">Name</Label>
+                <Input
+                  defaultValue="100%"
+                  className="col-span-2 h-8"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label htmlFor="maxWidth">School</Label>
+                <Input
+                  defaultValue="300px"
+                  className="col-span-2 h-8"
+                  value={school}
+                  onChange={(e) => setSchool(e.target.value)}
+                />
+              </div>
+              <PopoverClose asChild>
+                <Button
+                  onClick={() => {
+                    wrestlersCollection.insert({
+                      id: "",
+                      name,
+                      school,
+                    });
+                    setName("");
+                    setSchool("");
+                  }}
+                  size="default"
+                  variant="secondary"
+                >
+                  <IconPlus /> <span>Add</span>
+                </Button>
+              </PopoverClose>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
 
 const columns: ColumnDef<z.infer<typeof schema>>[] = [
   {
@@ -121,43 +179,45 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       const [name, setName] = React.useState(row.original.wrestler.name);
       const [school, setSchool] = React.useState(row.original.wrestler.school);
       return (
-        <div className="flex w-full justify-end">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="icon">
-                <IconEdit />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent side="left" align="center" className="w-80">
-              <div className="grid gap-4">
-                <div className="space-y-2 flex justify-between">
-                  <h4 className="leading-none font-bold text-xl flex gap-1 items-center">
-                    <IconEdit />
-                    <span>Edit</span>
-                  </h4>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="icon">
+              <IconEdit />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="center" className="w-80">
+            <div className="grid gap-4">
+              <div className="space-y-2 flex justify-between">
+                <h4 className="leading-none font-bold text-xl flex gap-1 items-center">
+                  <IconEdit />
+                  <span>Edit</span>
+                </h4>
+                <PopoverClose asChild>
                   <Button size="icon" variant="destructive">
                     <IconTrashX />
                   </Button>
+                </PopoverClose>
+              </div>
+              <div className="grid gap-2">
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="width">Name</Label>
+                  <Input
+                    defaultValue="100%"
+                    className="col-span-2 h-8"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
                 </div>
-                <div className="grid gap-2">
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="width">Name</Label>
-                    <Input
-                      defaultValue="100%"
-                      className="col-span-2 h-8"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </div>
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="maxWidth">School</Label>
-                    <Input
-                      defaultValue="300px"
-                      className="col-span-2 h-8"
-                      value={school}
-                      onChange={(e) => setSchool(e.target.value)}
-                    />
-                  </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="maxWidth">School</Label>
+                  <Input
+                    defaultValue="300px"
+                    className="col-span-2 h-8"
+                    value={school}
+                    onChange={(e) => setSchool(e.target.value)}
+                  />
+                </div>
+                <PopoverClose asChild>
                   <Button
                     onClick={() =>
                       updateWrestler({
@@ -171,11 +231,11 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
                   >
                     <IconDeviceFloppy /> <span>Save</span>
                   </Button>
-                </div>
+                </PopoverClose>
               </div>
-            </PopoverContent>
-          </Popover>
-        </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       );
     },
   },
@@ -244,12 +304,15 @@ export function DataTable({
 
   return (
     <div className="w-full flex flex-col px-5 justify-start gap-4">
-      <Input
-        value={globalFilter ?? ""}
-        onChange={(e) => table.setGlobalFilter(String(e.target.value))}
-        placeholder="Search"
-        className="w-full @xl/main:w-7/12 @5xl/main:w-5/12 self-end"
-      />
+      <div className="flex flex-row justify-between gap-2">
+        <AddWrestlerPopover />
+        <Input
+          value={globalFilter ?? ""}
+          onChange={(e) => table.setGlobalFilter(String(e.target.value))}
+          placeholder="Search"
+          className="w-full @xl/main:w-7/12 @5xl/main:w-5/12"
+        />
+      </div>
       <div className="overflow-hidden rounded-lg border">
         <Table>
           <TableHeader className="bg-muted sticky top-0 z-10">

@@ -1,19 +1,30 @@
 import { asc, count, eq, getTableColumns, gt, sql, or } from "drizzle-orm";
 import { db } from "../db/app";
 import {
-  wrestlersSelectSchema,
-  wrestlersInsertSchema,
-  type WrestlerInsert,
   wrestlersTable,
-  votersInsertSchema,
-  votesInsertSchema,
-  type VotesInsert,
   votesTable,
   votersTable,
+  type WrestlerUpdate,
+  wrestlerUpdateSchema,
+  type BaseWrestlers,
+  baseWrestlersSchema,
 } from "../db/schema/app";
 import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { v7 as uuid } from "uuid";
+import pino from "pino";
+
+const logger =
+  process.env.NODE_ENV === "production"
+    ? pino()
+    : pino({
+        transport: {
+          target: "pino-pretty",
+          options: {
+            colorize: true,
+          },
+        },
+      });
 
 type GetWrestlers = {
   cursor: string;
@@ -126,14 +137,23 @@ export const submitVote = createServerFn({ method: "POST" })
   });
 
 export const updateWrestler = createServerFn({ method: "POST" })
-  .inputValidator((data: WrestlerInsert) => data)
+  .inputValidator((data: WrestlerUpdate) => {
+    try {
+      return wrestlerUpdateSchema.parse(data);
+    } catch (error) {
+      logger.error(error);
+      throw new Error("failed validate input");
+    }
+  })
   .handler(async ({ data }) => {
+    logger.info({ message: "Updating Wrestler", data });
+    const updateValues = Object.fromEntries(
+      Object.entries(data.newValues).filter(([_, v]) => v != null),
+    ) as Partial<typeof wrestlersTable.$inferInsert>;
+
     const query = db
       .update(wrestlersTable)
-      .set({
-        name: data.name,
-        school: data.school,
-      })
+      .set(updateValues)
       .where(eq(wrestlersTable.id, data.id))
       .returning({ id: wrestlersTable.id, name: wrestlersTable.name });
 
@@ -143,4 +163,36 @@ export const updateWrestler = createServerFn({ method: "POST" })
       return { message: "Wrestler no Found", code: "WARN" };
     }
     return { message: `Updated ${wrestler[0]!.name}`, code: "SUCCESS" };
+  });
+
+export const addWrestlers = createServerFn({ method: "POST" })
+  .inputValidator((data: BaseWrestlers) => {
+    try {
+      return baseWrestlersSchema.parse(data);
+    } catch (error) {
+      logger.error(error);
+      throw new Error("failed validate input to add Wrestler");
+    }
+  })
+  .handler(async ({ data }) => {
+    logger.info({ message: "Adding Wrestler", data });
+    const wrestlers = await db
+      .insert(wrestlersTable)
+      .values(data)
+      .onConflictDoNothing()
+      .returning({
+        id: wrestlersTable.id,
+        name: wrestlersTable.name,
+        school: wrestlersTable.school,
+      });
+
+    if (wrestlers.length === 0) {
+      return { message: "Failed to add wrestler", code: 500 };
+    }
+    logger.debug({ wrestlers });
+    return {
+      message: `Added Wrestler${wrestlers.length > 1 ? "s" : ""}`,
+      code: 200,
+      data: wrestlers,
+    };
   });

@@ -4,7 +4,7 @@ import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useMemo } from "react";
-import { useLiveQuery, count, eq } from "@tanstack/react-db";
+import { useLiveQuery, count, eq, coalesce } from "@tanstack/react-db";
 import { wrestlersCollection, votesCollection } from "@/routes/__root";
 import { nullishWrestler } from "@/schema";
 
@@ -19,14 +19,15 @@ export default function Page() {
         wrestlerId: vote.wrestlerId,
         totalVotes: count(vote.id),
       }));
-    const wrestlers = q
+    return q
       .from({ wrestler: wrestlersCollection })
-      .rightJoin({ votes }, ({ wrestler, votes }) => {
+      .leftJoin({ votes }, ({ wrestler, votes }) => {
         return eq(wrestler.id, votes.wrestlerId);
       })
-      .orderBy(({ votes }) => votes.totalVotes);
-
-    return q.from({ wrestlers });
+      .select(({ wrestler, votes }) => ({
+        wrestler,
+        votes: coalesce(votes, { wrestlerId: wrestler.id, totalVotes: 0 }),
+      }));
   });
   const { data: votes } = useLiveQuery((q) =>
     q

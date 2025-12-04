@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createSelectSchema, createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { v7 as uuid } from "uuid";
 
 export const votersTable = sqliteTable("voters", {
   id: text("id").primaryKey(),
@@ -23,6 +24,27 @@ export const wrestlersTable = sqliteTable("wrestlers", {
 export const wrestlersSelectSchema = createSelectSchema(wrestlersTable);
 export const wrestlersInsertSchema = createInsertSchema(wrestlersTable);
 export type WrestlerInsert = z.infer<typeof wrestlersInsertSchema>;
+
+export const baseWrestlersSchema = z.array(
+  z.object({
+    id: z.string().transform(() => uuid()),
+    name: z.string(),
+    school: z.string(),
+  }),
+);
+export const wrestlerUpdateSchema = z.object({
+  id: z.uuid({ version: "v7" }),
+  newValues: z
+    .object({
+      name: z.string().nullish(),
+      school: z.string().nullish(),
+    })
+    .refine((val) => val.name !== undefined || val.school !== undefined, {
+      error: "Must Update Name or School",
+    }),
+});
+export type BaseWrestlers = z.infer<typeof baseWrestlersSchema>;
+export type WrestlerUpdate = z.infer<typeof wrestlerUpdateSchema>;
 
 export const votesTable = sqliteTable("votes", {
   id: text("id").primaryKey(),
