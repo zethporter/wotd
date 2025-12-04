@@ -2,6 +2,8 @@ import { asc, count, eq, getTableColumns, gt, sql, or } from "drizzle-orm";
 import { db } from "../db/app";
 import {
   wrestlersSelectSchema,
+  wrestlersInsertSchema,
+  type WrestlerInsert,
   wrestlersTable,
   votersInsertSchema,
   votesInsertSchema,
@@ -95,7 +97,6 @@ export const submitVote = createServerFn({ method: "POST" })
       .from(votersTable)
       .where(eq(votersTable.fingerprint, data.fingerprint));
     const voter = await query.execute();
-    console.log("voter response", JSON.stringify({ voter }, null, 2));
     if (voter.length > 0) {
       throw redirect({
         to: "/already-voted",
@@ -122,4 +123,24 @@ export const submitVote = createServerFn({ method: "POST" })
     throw redirect({
       to: "/voted",
     });
+  });
+
+export const updateWrestler = createServerFn({ method: "POST" })
+  .inputValidator((data: WrestlerInsert) => data)
+  .handler(async ({ data }) => {
+    const query = db
+      .update(wrestlersTable)
+      .set({
+        name: data.name,
+        school: data.school,
+      })
+      .where(eq(wrestlersTable.id, data.id))
+      .returning({ id: wrestlersTable.id, name: wrestlersTable.name });
+
+    const wrestler = await query.execute();
+
+    if (wrestler.length === 0) {
+      return { message: "Wrestler no Found", code: "WARN" };
+    }
+    return { message: `Updated ${wrestler[0]!.name}`, code: "SUCCESS" };
   });

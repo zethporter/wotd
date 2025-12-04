@@ -15,7 +15,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createCollection } from "@tanstack/react-db";
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { getAllWrestlers, getAllVotes } from "@/serverFunctions/tursoFunctions";
+import { Toaster } from "@/components/ui/sonner";
 
+import appCss from "@/styles/app.css?url";
 // Create a client
 export const queryClient = new QueryClient();
 
@@ -43,8 +45,6 @@ export const votesCollection = createCollection(
     getKey: (item) => item.id,
   }),
 );
-
-import appCss from "@/styles/app.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -95,6 +95,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
               {children}
               <Scripts />
               <ModeToggle />
+              <Toaster />
             </body>
           </FingerprintProvider>
         </ThemeProvider>

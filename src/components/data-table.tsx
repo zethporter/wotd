@@ -24,18 +24,9 @@ import {
   type VisibilityState,
 } from "@tanstack/react-table";
 import { z } from "zod";
-
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "./ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -57,6 +48,24 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { updateWrestler as uw } from "@/serverFunctions/tursoFunctions";
+import type { WrestlerInsert } from "@/db/schema/app";
+
+const updateWrestler = async (wrestler: WrestlerInsert) => {
+  toast.loading("Saving wrestler...", { id: wrestler.id });
+  try {
+    const response = await uw({ data: wrestler });
+    if (response.code === "SUCCESS") {
+      toast.success(response.message, { id: wrestler.id });
+    } else if (response.code === "WARN") {
+      toast.warning(response.message, { id: wrestler.id });
+    } else {
+      toast.info("hmm...", { id: wrestler.id });
+    }
+  } catch {
+    toast.error("Failed to save wrestler", { id: wrestler.id });
+  }
+};
 
 export const schema = z.object({
   wrestler: z.object({
@@ -149,7 +158,17 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
                       onChange={(e) => setSchool(e.target.value)}
                     />
                   </div>
-                  <Button size="default" variant="secondary">
+                  <Button
+                    onClick={() =>
+                      updateWrestler({
+                        id: row.original.wrestler.id,
+                        name,
+                        school,
+                      })
+                    }
+                    size="default"
+                    variant="secondary"
+                  >
                     <IconDeviceFloppy /> <span>Save</span>
                   </Button>
                 </div>

@@ -22,6 +22,7 @@ export const wrestlersTable = sqliteTable("wrestlers", {
 });
 export const wrestlersSelectSchema = createSelectSchema(wrestlersTable);
 export const wrestlersInsertSchema = createInsertSchema(wrestlersTable);
+export type WrestlerInsert = z.infer<typeof wrestlersInsertSchema>;
 
 export const votesTable = sqliteTable("votes", {
   id: text("id").primaryKey(),
