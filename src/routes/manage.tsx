@@ -9,9 +9,6 @@ export const Route = createFileRoute("/manage")({
 
 async function RouteComponent() {
   const { isPending, data: session } = useSession();
-  if (isPending && !session) {
-    return <div>loading...</div>;
-  }
   if (!session) {
     return (
       <div>
@@ -24,6 +21,9 @@ async function RouteComponent() {
         </Button>
       </div>
     );
+  }
+  if (isPending) {
+    return <div>loading...</div>;
   }
 
   if (session.user.role && session.user.role.includes("admin")) {

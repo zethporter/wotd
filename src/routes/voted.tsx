@@ -14,7 +14,7 @@ function RouteComponent() {
 function Voted() {
   const startConfetti = () => {
     const end = Date.now() + 3 * 1000; // 3 seconds
-    const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"];
+    const colors = ["#3a5ba0", "#f7c873", "#6ea3c1", "#a04a6c"];
 
     const frame = () => {
       if (Date.now() > end) return;
@@ -48,8 +48,11 @@ function Voted() {
 
   return (
     <div className="h-screen w-full flex justify-center items-center">
-      <h1 className="text-4xl font-bold tracking-tighter md:text-5xl lg:text-7xl">
-        Thanks for <AuroraText>Voting</AuroraText>
+      <h1 className="text-4xl font-semibold md:text-5xl lg:text-7xl">
+        Thanks for{" "}
+        <AuroraText colors={["#3a5ba0", "#f7c873", "#6ea3c1", "#a04a6c"]}>
+          Voting
+        </AuroraText>
       </h1>
     </div>
   );
