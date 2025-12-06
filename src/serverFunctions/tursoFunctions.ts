@@ -160,9 +160,9 @@ export const updateWrestler = createServerFn({ method: "POST" })
     const wrestler = await query.execute();
 
     if (wrestler.length === 0) {
-      return { message: "Wrestler no Found", code: "WARN" };
+      return { message: "Wrestler no Found", code: 400 };
     }
-    return { message: `Updated ${wrestler[0]!.name}`, code: "SUCCESS" };
+    return { message: `Updated ${wrestler[0]!.name}`, code: 200 };
   });
 
 export const addWrestlers = createServerFn({ method: "POST" })
@@ -189,10 +189,43 @@ export const addWrestlers = createServerFn({ method: "POST" })
     if (wrestlers.length === 0) {
       return { message: "Failed to add wrestler", code: 500 };
     }
-    logger.debug({ wrestlers });
     return {
       message: `Added Wrestler${wrestlers.length > 1 ? "s" : ""}`,
       code: 200,
       data: wrestlers,
     };
   });
+
+export const deleteWrestler = createServerFn({ method: "POST" })
+  .inputValidator((data: string) => data)
+  .handler(async ({ data }) => {
+    logger.info({ message: "Deleting Wrestler", data });
+    const deleted = await db
+      .delete(wrestlersTable)
+      .where(eq(wrestlersTable.id, data))
+      .returning({
+        id: wrestlersTable.id,
+        name: wrestlersTable.name,
+        school: wrestlersTable.school,
+      });
+    if (deleted.length === 0) {
+      return { message: "Failed to delete wrestler", code: 500 };
+    }
+    return {
+      message: `Deleted Wrestler${deleted.length > 1 ? "s" : ""}`,
+      code: 200,
+      data: deleted,
+    };
+  });
+
+export const deleteAllWrestlers = createServerFn({ method: "POST" }).handler(
+  async () => {
+    logger.info({ message: "Deleting All Wrestler" });
+    await db.delete(wrestlersTable);
+
+    return {
+      message: "All Wrestlers Deleted",
+      code: 200,
+    };
+  },
+);

@@ -9,6 +9,9 @@ import {
   IconDeviceFloppy,
   IconPlus,
   IconUserPlus,
+  IconSortAscendingSmallBig,
+  IconSortDescendingSmallBig,
+  IconFilter,
 } from "@tabler/icons-react";
 import {
   type ColumnDef,
@@ -60,6 +63,10 @@ const updateWrestler = (wrestler: WrestlerInsert) => {
     w.name = wrestler.name;
     w.school = wrestler.school;
   });
+};
+
+const deleteWrestler = (wrestler: WrestlerInsert) => {
+  wrestlersCollection.delete(wrestler.id);
 };
 
 export const schema = z.object({
@@ -179,63 +186,75 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       const [name, setName] = React.useState(row.original.wrestler.name);
       const [school, setSchool] = React.useState(row.original.wrestler.school);
       return (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon">
-              <IconEdit />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="center" className="w-80">
-            <div className="grid gap-4">
-              <div className="space-y-2 flex justify-between">
-                <h4 className="leading-none font-bold text-xl flex gap-1 items-center">
-                  <IconEdit />
-                  <span>Edit</span>
-                </h4>
-                <PopoverClose asChild>
-                  <Button size="icon" variant="destructive">
-                    <IconTrashX />
-                  </Button>
-                </PopoverClose>
-              </div>
-              <div className="grid gap-2">
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="width">Name</Label>
-                  <Input
-                    defaultValue="100%"
-                    className="col-span-2 h-8"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
+        <div className="justify-end w-full flex">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon">
+                <IconEdit />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="left" align="center" className="w-80">
+              <div className="grid gap-4">
+                <div className="space-y-2 flex justify-between">
+                  <h4 className="leading-none font-bold text-xl flex gap-1 items-center">
+                    <IconEdit />
+                    <span>Edit</span>
+                  </h4>
+                  <PopoverClose asChild>
+                    <Button
+                      onClick={() =>
+                        deleteWrestler({
+                          id: row.original.wrestler.id,
+                          name,
+                          school,
+                        })
+                      }
+                      size="icon"
+                      variant="destructive"
+                    >
+                      <IconTrashX />
+                    </Button>
+                  </PopoverClose>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="maxWidth">School</Label>
-                  <Input
-                    defaultValue="300px"
-                    className="col-span-2 h-8"
-                    value={school}
-                    onChange={(e) => setSchool(e.target.value)}
-                  />
+                <div className="grid gap-2">
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="width">Name</Label>
+                    <Input
+                      defaultValue="100%"
+                      className="col-span-2 h-8"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="maxWidth">School</Label>
+                    <Input
+                      defaultValue="300px"
+                      className="col-span-2 h-8"
+                      value={school}
+                      onChange={(e) => setSchool(e.target.value)}
+                    />
+                  </div>
+                  <PopoverClose asChild>
+                    <Button
+                      onClick={() =>
+                        updateWrestler({
+                          id: row.original.wrestler.id,
+                          name,
+                          school,
+                        })
+                      }
+                      size="default"
+                      variant="secondary"
+                    >
+                      <IconDeviceFloppy /> <span>Save</span>
+                    </Button>
+                  </PopoverClose>
                 </div>
-                <PopoverClose asChild>
-                  <Button
-                    onClick={() =>
-                      updateWrestler({
-                        id: row.original.wrestler.id,
-                        name,
-                        school,
-                      })
-                    }
-                    size="default"
-                    variant="secondary"
-                  >
-                    <IconDeviceFloppy /> <span>Save</span>
-                  </Button>
-                </PopoverClose>
               </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+            </PopoverContent>
+          </Popover>
+        </div>
       );
     },
   },
@@ -321,12 +340,34 @@ export function DataTable({
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id} colSpan={header.colSpan}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={
+                            header.column.getCanSort()
+                              ? "cursor-pointer select-none flex justify-between"
+                              : ""
+                          }
+                          onClick={header.column.getToggleSortingHandler()}
+                          title={
+                            header.column.getCanSort()
+                              ? header.column.getNextSortingOrder() === "asc"
+                                ? "Sort ascending"
+                                : header.column.getNextSortingOrder() === "desc"
+                                  ? "Sort descending"
+                                  : "Clear sort"
+                              : undefined
+                          }
+                        >
+                          {flexRender(
                             header.column.columnDef.header,
                             header.getContext(),
                           )}
+                          {{
+                            asc: <IconSortAscendingSmallBig />,
+                            desc: <IconSortDescendingSmallBig />,
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
+                      )}
                     </TableHead>
                   );
                 })}

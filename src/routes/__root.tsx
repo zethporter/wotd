@@ -19,6 +19,7 @@ import {
   getAllVotes,
   updateWrestler,
   addWrestlers,
+  deleteWrestler,
 } from "@/serverFunctions/tursoFunctions";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -57,16 +58,47 @@ export const wrestlersCollection = createCollection(
         changes: m.changes,
       }));
       for (const wrestler of wrestlers) {
-        await updateWrestler({
-          data: { id: wrestler.id, newValues: wrestler.changes },
-        });
+        try {
+          const response = await updateWrestler({
+            data: { id: wrestler.id, newValues: wrestler.changes },
+          });
+          switch (response.code) {
+            case 200:
+              toast.success(response.message);
+              break;
+            case 400:
+              toast.warning(response.message);
+              break;
+            default:
+              toast.error("Something went wrong");
+          }
+        } catch {
+          toast.error("Something went wronger");
+        }
       }
     },
-    // onDelete: async ({ transaction }) => {
-    //       const ids = transaction.mutations.map((m) => m.key)
-    //       await api.deleteTodos(ids)
-    //     },
-    //   })
+    onDelete: async ({ transaction }) => {
+      const wrestlers = transaction.mutations.map((m) => m.key);
+      for (const wrestler of wrestlers) {
+        try {
+          const response = await deleteWrestler({
+            data: wrestler,
+          });
+          switch (response.code) {
+            case 200:
+              toast.success(response.message);
+              break;
+            case 500:
+              toast.error(response.message);
+              break;
+            default:
+              toast.error("Something went wrong");
+          }
+        } catch {
+          toast.error("Something went wronger");
+        }
+      }
+    },
   }),
 );
 
