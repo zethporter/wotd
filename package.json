@@ -8,6 +8,7 @@
   },
   "private": true,
   "devDependencies": {
+    "@fontsource-variable/ubuntu-sans": "^5.2.10",
     "@tanstack/react-router-devtools": "^1.139.14",
     "@types/bun": "latest",
     "@types/react": "^19.2.7",

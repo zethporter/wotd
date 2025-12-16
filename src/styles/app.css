@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@import "@fontsource-variable/ubuntu-sans";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -88,19 +90,27 @@
       transform: rotate(-5deg) scale(0.9);
     }
   }
-  --animate-grid: grid 15s linear infinite
-;
+  --animate-grid: grid 15s linear infinite;
   @keyframes grid {
-  0% {
-    transform: translateY(-50%);}
-  100% {
-    transform: translateY(0);}}
-  --animate-ripple: ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite;
+    0% {
+      transform: translateY(-50%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  --animate-ripple: ripple var(--duration, 2s) ease calc(var(--i, 0) * 0.2s)
+    infinite;
   @keyframes ripple {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);}
-  50% {
-    transform: translate(-50%, -50%) scale(0.9);}}}
+    0%,
+    100% {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
+}
 
 :root {
   --radius: 0.625rem;
@@ -266,7 +276,7 @@
   --sidebar-accent-foreground: oklch(0.2558 0.0433 268.0662);
   --sidebar-border: oklch(0.7791 0.0156 251.1926);
   --sidebar-ring: oklch(0.8567 0.1164 81.0092);
-  --font-sans: Libre Baskerville, serif;
+  --font-sans: "Ubuntu Sans Variable", sans-serif;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
@@ -327,7 +337,7 @@
   --sidebar-accent-foreground: oklch(0.2703 0.0407 281.3036);
   --sidebar-border: oklch(0.3072 0.0287 281.7681);
   --sidebar-ring: oklch(0.9097 0.144 95.112);
-  --font-sans: Libre Baskerville, serif;
+  --font-sans: "Ubuntu Sans Variable", sans-serif;
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",

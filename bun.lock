@@ -59,6 +59,7 @@
         "zod": "^4.1.13",
       },
       "devDependencies": {
+        "@fontsource-variable/ubuntu-sans": "^5.2.10",
         "@tanstack/react-router-devtools": "^1.139.14",
         "@types/bun": "latest",
         "@types/react": "^19.2.7",
@@ -217,6 +218,8 @@
     "@floating-ui/react-dom": ["@floating-ui/react-dom@2.1.4", "", { "dependencies": { "@floating-ui/dom": "^1.7.2" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-JbbpPhp38UmXDDAu60RJmbeme37Jbgsm7NrHGgzYYFKmblzRUh6Pa641dII6LsjwF4XlScDrde2UAzDo/b9KPw=="],
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.10", "", {}, "sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ=="],
+
+    "@fontsource-variable/ubuntu-sans": ["@fontsource-variable/ubuntu-sans@5.2.10", "", {}, "sha512-oDLimqeDpeHynO+r+UqODkoeniVJZqHsQ863H3pu8anqDOa6bCknOWEuipOzOF31k5ongz/OGN55H+rb/+rJkQ=="],
 
     "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@0.3.12", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-OuLGC46TjB5BbN1dH8JULVVZY4WTdkF7tV9Ys6wLL1rubZnCMstOhNHueU5bLCrnRuDhKPDM4g6sw4Bel5Gzqg=="],
 

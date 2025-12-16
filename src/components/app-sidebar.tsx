@@ -32,33 +32,6 @@ import {
 
 import { useSession, signOut } from "@/utils/auth-client";
 
-const data = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
-    },
-    {
-      title: "Edit Wrestlers",
-      url: "#",
-      icon: IconUsers,
-    },
-    {
-      title: "Edit Votes",
-      url: "#",
-      icon: IconPencil,
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-  ],
-};
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
 
@@ -80,8 +53,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain />
       </SidebarContent>
       <SidebarFooter>
         <NavUser
