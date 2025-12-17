@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { v7 } from "uuid";
 
 export const voter = z.object({
   _id: z.string().nullish(),
@@ -24,5 +25,14 @@ export const wrestler = z.object({
 export const nullishWrestler = wrestler.nullish();
 export type Wrestler = z.infer<typeof wrestler>;
 export type NullishWrestler = z.infer<typeof nullishWrestler>;
+
+export const massWrestler = z.object({
+  id: z
+    .string()
+    .optional()
+    .transform((val) => val ?? v7()),
+  name: z.string(),
+  school: z.string(),
+});
 
 export const a_wrestler = z.array(wrestler);

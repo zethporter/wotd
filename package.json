@@ -11,6 +11,7 @@
     "@fontsource-variable/ubuntu-sans": "^5.2.10",
     "@tanstack/react-router-devtools": "^1.139.14",
     "@types/bun": "latest",
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "drizzle-kit": "^0.31.7",

@@ -40,6 +40,7 @@ export const wrestlersCollection = createCollection(
     getKey: (item) => item.id,
     onInsert: async ({ transaction }) => {
       const newWrestlers = transaction.mutations.map((m) => m.modified);
+      console.debug("Adding Wrestlers", { newWrestlers });
       const response = await addWrestlers({ data: newWrestlers });
       if (response.code === 200) {
         toast.success(response.message);
