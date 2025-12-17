@@ -57,83 +57,49 @@ const VoteContent = ({
   searchValue: string;
   fingerprint: string | null;
 }) => {
-  // const getWrestlers = useServerFn(gw);
   const submitVote = useServerFn(sv);
-  // const {
-  //   data,
-  //   error,
-  //   fetchNextPage,
-  //   hasNextPage,
-  //   isFetching,
-  //   isFetchingNextPage,
-  //   status,
-  // } = useInfiniteQuery({
-  //   queryKey: ["projects", searchValue],
-  //   queryFn: async ({ pageParam, queryKey }) =>
-  //     await getWrestlers({
-  //       data: { cursor: pageParam, pageSize: 20, search: queryKey[1] },
-  //     }),
-  //   initialPageParam: "",
-  //   getNextPageParam: (lastPage, pages) => lastPage.pagination.lastCursor,
-  // });
-
-  // if (status === "pending") {
-  //   return <p>Loading...</p>;
-  // }
-  // if (status === "error") {
-  //   return <p>Error: {error.message}</p>;
-  // }
 
   const { data } = useLiveQuery((q) =>
     q.from({ wrestler: wrestlersCollection }),
   );
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 h-screen">
+    <div className="flex flex-col items-center justify-center gap-6 h-screen overflow-hidden pt-36 pb-14">
       <Input
-        className="w-2xl max-w-10/12 mx-auto text-center fixed top-36"
+        className="w-2xl max-w-10/12 mx-auto text-center sticky top-0"
         value={search}
         placeholder="Search for a wrestler or school"
         onChange={(e) => setSearch(e.target.value)}
       />
-      <RadioGroup value={wrestlerId} onValueChange={(e) => setWrestlerId(e)}>
-        {data
-          .filter((wrestler) => {
-            if (search === "" || search === null) {
-              return true;
-            }
-            return (
-              wrestler.name.toLowerCase().includes(search.toLowerCase()) ||
-              wrestler.school.toLowerCase().includes(search.toLowerCase())
-            );
-          })
-          .map((wrestler) => (
-            <div key={wrestler.id} className="flex items-center gap-3">
-              <RadioGroupItem
-                className="size-6"
-                value={wrestler.id}
-                id={wrestler.id}
-              />
-              <Label className="text-xl" htmlFor={wrestler.id}>
-                <span className="font-semibold">{wrestler.name}</span>
-                <Badge className="text-sm" variant="outline">
-                  {wrestler.school}
-                </Badge>
-              </Label>
-            </div>
-          ))}
-      </RadioGroup>
-      {/*<div>
-        <Button
-          onClick={() => fetchNextPage()}
-          disabled={!hasNextPage || isFetching}
-          variant="destructive"
-          className={twMerge(clsx(hasNextPage ? "" : "hidden"))}
-        >
-          {isFetchingNextPage ? "Loading more..." : "Load More"}
-        </Button>
+      <div className="grow overflow-x-auto">
+        <RadioGroup value={wrestlerId} onValueChange={(e) => setWrestlerId(e)}>
+          {data
+            .filter((wrestler) => {
+              if (search === "" || search === null) {
+                return true;
+              }
+              return (
+                wrestler.name.toLowerCase().includes(search.toLowerCase()) ||
+                wrestler.school.toLowerCase().includes(search.toLowerCase())
+              );
+            })
+            .map((wrestler) => (
+              <div key={wrestler.id} className="flex items-center gap-3">
+                <RadioGroupItem
+                  className="size-6"
+                  value={wrestler.id}
+                  id={wrestler.id}
+                />
+                <Label className="text-xl" htmlFor={wrestler.id}>
+                  <span className="font-semibold">{wrestler.name}</span>
+                  <Badge className="text-sm" variant="outline">
+                    {wrestler.school}
+                  </Badge>
+                </Label>
+              </div>
+            ))}
+        </RadioGroup>
       </div>
-      <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>*/}
       <Button
         type="button"
         disabled={!wrestlerId || !fingerprint}
