@@ -7,9 +7,12 @@ import { nitro } from 'nitro/vite'
 import viteReact from '@vitejs/plugin-react'
 
 export default defineConfig({
-  // 1. Force Vite to bundle these instead of leaving them as imports
   ssr: {
-    noExternal: ['@tabler/icons-react'],
+    noExternal: [
+      '@tabler/icons-react',
+      '@tanstack/react-router',
+      '@tanstack/react-start',
+    ],
   },
   optimizeDeps: {
     include: ['@tabler/icons-react'],
