@@ -8,6 +8,7 @@ import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
   plugins: [
+    tanstackStart(),
     devtools(),
     nitro({
       preset: 'vercel',
@@ -22,7 +23,6 @@ const config = defineConfig({
       projects: ['./tsconfig.json'],
     }),
     tailwindcss(),
-    tanstackStart(),
     viteReact(),
   ],
 })
