@@ -6,27 +6,30 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 export default defineConfig({
+  // 1. Force Vite to bundle these instead of leaving them as imports
   ssr: {
     noExternal: [
       '@tanstack/react-start',
-      '@tanstack/start-server-functions-server',
+      '@tanstack/start-server-core',
+      '@tanstack/react-router',
     ],
   },
   plugins: [
-    // 1. TanStack Start handles the heavy lifting and React injection
     tanstackStart(),
-    // 2. Tooling and CSS
-    devtools(),
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
     tailwindcss(),
-    // 3. Nitro MUST come last. It takes the transformed output
-    // and packages it for the Vercel deployment.
+    devtools(),
     nitro({
       preset: 'vercel',
+      // 2. Force Nitro to inline these during the second bundling pass
       externals: {
-        inline: ['@tabler/icons-react'],
+        inline: [
+          '@tabler/icons-react',
+          '@tanstack/react-start',
+          '@tanstack/start-server-core',
+        ],
       },
     }),
   ],
