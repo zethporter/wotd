@@ -12,6 +12,9 @@ const config = defineConfig({
     devtools(),
     nitro({
       preset: 'vercel',
+      externals: {
+        inline: ['@tabler/icons-react'],
+      },
     }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
