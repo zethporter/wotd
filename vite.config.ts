@@ -4,7 +4,6 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
-import viteReact from '@vitejs/plugin-react'
 
 export default defineConfig({
   ssr: {
@@ -25,9 +24,14 @@ export default defineConfig({
     tailwindcss(),
     devtools(),
     nitro(),
-    viteReact(),
   ],
   nitro: {
     preset: 'vercel',
+    rollupConfig: {
+      output: {
+        entryFileNames: 'index.mjs',
+      },
+    },
+    moduleSideEffects: ['@tanstack/react-start/server'],
   },
 })
