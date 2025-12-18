@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VotedRouteImport } from './routes/voted'
 import { Route as VoteRouteImport } from './routes/vote'
-import { Route as UserAccountRouteImport } from './routes/user-account'
 import { Route as ManageRouteImport } from './routes/manage'
 import { Route as EnterVoteCodeRouteImport } from './routes/enter-vote-code'
 import { Route as AlreadyVotedRouteImport } from './routes/already-voted'
@@ -26,11 +25,6 @@ const VotedRoute = VotedRouteImport.update({
 const VoteRoute = VoteRouteImport.update({
   id: '/vote',
   path: '/vote',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UserAccountRoute = UserAccountRouteImport.update({
-  id: '/user-account',
-  path: '/user-account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ManageRoute = ManageRouteImport.update({
@@ -64,7 +58,6 @@ export interface FileRoutesByFullPath {
   '/already-voted': typeof AlreadyVotedRoute
   '/enter-vote-code': typeof EnterVoteCodeRoute
   '/manage': typeof ManageRoute
-  '/user-account': typeof UserAccountRoute
   '/vote': typeof VoteRoute
   '/voted': typeof VotedRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -74,7 +67,6 @@ export interface FileRoutesByTo {
   '/already-voted': typeof AlreadyVotedRoute
   '/enter-vote-code': typeof EnterVoteCodeRoute
   '/manage': typeof ManageRoute
-  '/user-account': typeof UserAccountRoute
   '/vote': typeof VoteRoute
   '/voted': typeof VotedRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -85,7 +77,6 @@ export interface FileRoutesById {
   '/already-voted': typeof AlreadyVotedRoute
   '/enter-vote-code': typeof EnterVoteCodeRoute
   '/manage': typeof ManageRoute
-  '/user-account': typeof UserAccountRoute
   '/vote': typeof VoteRoute
   '/voted': typeof VotedRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -97,7 +88,6 @@ export interface FileRouteTypes {
     | '/already-voted'
     | '/enter-vote-code'
     | '/manage'
-    | '/user-account'
     | '/vote'
     | '/voted'
     | '/api/auth/$'
@@ -107,7 +97,6 @@ export interface FileRouteTypes {
     | '/already-voted'
     | '/enter-vote-code'
     | '/manage'
-    | '/user-account'
     | '/vote'
     | '/voted'
     | '/api/auth/$'
@@ -117,7 +106,6 @@ export interface FileRouteTypes {
     | '/already-voted'
     | '/enter-vote-code'
     | '/manage'
-    | '/user-account'
     | '/vote'
     | '/voted'
     | '/api/auth/$'
@@ -128,7 +116,6 @@ export interface RootRouteChildren {
   AlreadyVotedRoute: typeof AlreadyVotedRoute
   EnterVoteCodeRoute: typeof EnterVoteCodeRoute
   ManageRoute: typeof ManageRoute
-  UserAccountRoute: typeof UserAccountRoute
   VoteRoute: typeof VoteRoute
   VotedRoute: typeof VotedRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -148,13 +135,6 @@ declare module '@tanstack/react-router' {
       path: '/vote'
       fullPath: '/vote'
       preLoaderRoute: typeof VoteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/user-account': {
-      id: '/user-account'
-      path: '/user-account'
-      fullPath: '/user-account'
-      preLoaderRoute: typeof UserAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manage': {
@@ -200,7 +180,6 @@ const rootRouteChildren: RootRouteChildren = {
   AlreadyVotedRoute: AlreadyVotedRoute,
   EnterVoteCodeRoute: EnterVoteCodeRoute,
   ManageRoute: ManageRoute,
-  UserAccountRoute: UserAccountRoute,
   VoteRoute: VoteRoute,
   VotedRoute: VotedRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
