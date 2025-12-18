@@ -1,23 +1,27 @@
-import { defineConfig } from "vite";
-import { devtools } from "@tanstack/devtools-vite";
-import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-import viteReact from "@vitejs/plugin-react";
-import viteTsConfigPaths from "vite-tsconfig-paths";
-import tailwindcss from "@tailwindcss/vite";
-import { nitro } from "nitro/vite";
+import { defineConfig } from 'vite'
+import { devtools } from '@tanstack/devtools-vite'
+import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import viteTsConfigPaths from 'vite-tsconfig-paths'
+import tailwindcss from '@tailwindcss/vite'
+import { nitro } from 'nitro/vite'
 
-const config = defineConfig({
+export default defineConfig({
+  ssr: {
+    noExternal: ['@tabler/icons-react'],
+  },
   plugins: [
-    devtools(),
-    nitro(),
-    // this is the plugin that enables path aliases
+    tanstackStart(),
     viteTsConfigPaths({
-      projects: ["./tsconfig.json"],
+      projects: ['./tsconfig.json'],
     }),
     tailwindcss(),
-    tanstackStart(),
-    viteReact(),
+    devtools(),
+    nitro(),
   ],
-});
-
-export default config;
+  nitro: {
+    preset: 'vercel',
+    experimental: {
+      openAPI: false,
+    },
+  },
+})
