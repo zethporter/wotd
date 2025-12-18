@@ -9,11 +9,10 @@ import viteReact from '@vitejs/plugin-react'
 export default defineConfig({
   // 1. Force Vite to bundle these instead of leaving them as imports
   ssr: {
-    noExternal: [
-      '@tanstack/react-start',
-      '@tanstack/start-server-core',
-      '@tanstack/react-router',
-    ],
+    noExternal: ['@tabler/icons-react'],
+  },
+  optimizeDeps: {
+    include: ['@tabler/icons-react'],
   },
   plugins: [
     tanstackStart(),
