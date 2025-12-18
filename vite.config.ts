@@ -1,28 +1,27 @@
 import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
-const config = defineConfig({
+export default defineConfig({
   plugins: [
+    // 1. TanStack Start handles the heavy lifting and React injection
     tanstackStart(),
+    // 2. Tooling and CSS
     devtools(),
+    viteTsConfigPaths({
+      projects: ['./tsconfig.json'],
+    }),
+    tailwindcss(),
+    // 3. Nitro MUST come last. It takes the transformed output
+    // and packages it for the Vercel deployment.
     nitro({
       preset: 'vercel',
       externals: {
         inline: ['@tabler/icons-react'],
       },
     }),
-    // this is the plugin that enables path aliases
-    viteTsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
-    tailwindcss(),
-    viteReact(),
   ],
 })
-
-export default config
