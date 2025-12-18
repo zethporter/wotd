@@ -18,28 +18,6 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
-  ssr: {
-    noExternal: [
-      '@tabler/icons-react',
-      '@tanstack/react-router',
-      '@tanstack/react-router-ssr-query',
-      '@tanstack/react-start',
-    ],
-    optimizeDeps: {
-      include: [
-        '@tanstack/react-router',
-        '@tanstack/react-router-ssr-query',
-        '@tanstack/react-start',
-      ],
-    },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-      },
-    },
-  },
 })
 
 export default config
