@@ -6,6 +6,12 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 export default defineConfig({
+  ssr: {
+    noExternal: [
+      '@tanstack/react-start',
+      '@tanstack/start-server-functions-server',
+    ],
+  },
   plugins: [
     // 1. TanStack Start handles the heavy lifting and React injection
     tanstackStart(),
