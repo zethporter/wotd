@@ -7,14 +7,7 @@ import { nitro } from 'nitro/vite'
 
 export default defineConfig({
   ssr: {
-    noExternal: [
-      '@tabler/icons-react',
-      '@tanstack/react-router',
-      '@tanstack/react-start',
-    ],
-  },
-  optimizeDeps: {
-    include: ['@tabler/icons-react'],
+    noExternal: ['@tabler/icons-react'],
   },
   plugins: [
     tanstackStart(),
@@ -27,11 +20,8 @@ export default defineConfig({
   ],
   nitro: {
     preset: 'vercel',
-    rollupConfig: {
-      output: {
-        entryFileNames: 'index.mjs',
-      },
+    experimental: {
+      openAPI: false,
     },
-    moduleSideEffects: ['@tanstack/react-start/server'],
   },
 })
